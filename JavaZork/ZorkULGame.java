@@ -23,7 +23,6 @@ public class ZorkULGame {
     private final Parser parser;
     private Character player;
     private final String name;
-    private static List<Room> allRooms = new ArrayList<>();
 
     public ZorkULGame(String name) {
         this.name = name;
@@ -48,12 +47,7 @@ public class ZorkULGame {
         mapleThick = new Room("in the maple thick");
         chilcroftwood = new Room("in the chilcroftwood");
 
-        allRooms.addAll(Arrays.asList(
-                wildWills, greasyBog, hedgehogAlp, ashgrove,
-                tallWoods, null, hazelwood, foxwood,
-                mapleThick, null, sunfield, stillgrass,
-                chilcroftwood, null, pub, null
-        ));
+
 
         // initialise room exits
         sunfield.setExit("east", stillgrass);
@@ -282,9 +276,7 @@ public class ZorkULGame {
         }
     }
 
-    public static List<Room> getAllRooms(){
-            return allRooms;
-    }
+
     private void goRoom(Command command) {
         if (!command.hasSecondWord()) {
             System.out.println("Go where?");

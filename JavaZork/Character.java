@@ -10,12 +10,11 @@ public class Character implements Serializable {
     private Room currentRoom;
     private List<Item> inventory = new ArrayList<>();
     private GameMap map;
-    private List<Room> allRooms = ZorkULGame.getAllRooms();
 
     public Character(String name, Room startingRoom) {
         this.name = name;
         this.currentRoom = startingRoom;
-        this.map = new GameMap(allRooms);
+        this.map = new GameMap();
         this.map.visitRoom(startingRoom);
     }
 
