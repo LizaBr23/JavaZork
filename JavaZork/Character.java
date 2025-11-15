@@ -36,6 +36,91 @@ public class Character implements Serializable {
         map.showMap(currentRoom);
     }
 
+    public void useTool(String toolName, String rawMaterialName) {
+        Tool tool = null;
+        for (Item item : inventory) {
+            if (item instanceof Tool && item.getName().equalsIgnoreCase(toolName)) {
+                tool = (Tool) item;
+                break;
+            }
+        }
+
+        if (tool == null) {
+            System.out.println("You don't have a " + toolName + ".");
+            return;
+        }
+
+        RawMaterial rawMaterial = null;
+        for (Item item : currentRoom.getItems()) {
+            if (item instanceof RawMaterial &&
+                    item.getName().equalsIgnoreCase(rawMaterialName)) {
+                rawMaterial = (RawMaterial) item;
+                break;
+            }
+        }
+
+        if (rawMaterial == null) {
+            System.out.println("There's no " + rawMaterialName + " here.");
+            return;
+        }
+
+        if (!tool.canUseOn(rawMaterial.getResultingIngredient())) {
+            System.out.println("You can't use " + toolName + " on " + rawMaterialName + ".");
+            return;
+        }
+
+        String ingredientName = tool.getResultIngredient(rawMaterialName);
+        if (ingredientName == null) {
+            ingredientName = rawMaterial.getResultingIngredient();
+        }
+
+        Ingredient ingredient = new Ingredient(
+                ingredientName,
+                "Processed from " + rawMaterialName,
+                currentRoom,
+                rawMaterial.getId() + 100
+        );
+
+        currentRoom.getItems().remove(rawMaterial);
+        currentRoom.getItems().add(ingredient);
+
+        System.out.println("You used " + toolName + " on " + rawMaterialName +
+                " and dropped " + ingredientName + "!");
+    }
+
+    public void squeezeItem(String itemName) {
+        // Find the item in the room
+        Item foundItem = null;
+        for (Item item : currentRoom.getItems()) {
+            if (item.getName().toLowerCase().contains(itemName.toLowerCase())) {
+                foundItem = item;
+                break;
+            }
+        }
+
+        if (foundItem == null) {
+            System.out.println("There's no " + itemName + " here to squeeze.");
+            return;
+        }
+
+        // Special handling for foxberry
+        if (foundItem.getName().equalsIgnoreCase("foxberry")) {
+            Ingredient juice = new Ingredient(
+                    "foxberryJuice",
+                    "Juice from tiny red berries that freezes water on contact",
+                    currentRoom,
+                    foundItem.getId() + 100
+            );
+
+            currentRoom.getItems().remove(foundItem);
+            currentRoom.getItems().add(juice);
+
+            System.out.println("You squeezed the foxberry and obtained foxberry juice!");
+        } else {
+            System.out.println("You can't squeeze that!");
+        }
+    }
+
     public void dropItem(String itemName) {
         List<Item> roomItems = currentRoom.getItems();
 

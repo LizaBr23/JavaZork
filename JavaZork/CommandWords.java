@@ -22,6 +22,8 @@ public class CommandWords {
         validCommands.put("save", "Save your game");
         validCommands.put("load", "Load your game");
         validCommands.put("map", "Show map of the world");
+        validCommands.put("use", "Use a tool");
+        validCommands.put("squeeze", "Make juice out of something");
     }
 //is command in a list of valid commands
     public boolean isCommand(String commandWord) {

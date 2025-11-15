@@ -98,18 +98,38 @@ public class ZorkULGame {
 
         Item beer = new  Item("beer", "Pint of Guinness on the wooden table", pub, 10);
 
-        Ingredient fernTips = new Ingredient("fernTips", "Dark moss that grows only under moonlight", chilcroftwood, 1);
-        Ingredient lavender = new Ingredient("lavender", "Pale flower that opens silently at night, releasing a calming scent", sunfield, 2);
-        Ingredient sweetGrass = new Ingredient("sweetGrass", "Fresh blades of grass with a sweet aroma, ideal for soothing teas", stillgrass, 3);
+//        Ingredient fernTips = new Ingredient("fernTips", "Dark moss that grows only under moonlight", chilcroftwood, 1);
+//        Ingredient lavender = new Ingredient("lavender", "Pale flower that opens silently at night, releasing a calming scent", sunfield, 2);
+//        Ingredient sweetGrass = new Ingredient("sweetGrass", "Fresh blades of grass with a sweet aroma, ideal for soothing teas", stillgrass, 3);
+//
+//        Ingredient ashRootSpice = new Ingredient("ashRootSpice", "Red-veined root that stays warm to the touch and adds a spicy kick", ashgrove, 4);
+//        Ingredient thornPowder = new Ingredient("thornPowder", "Flaking bark that sparks when scraped, useful for ignition or magic", greasyBog, 5);
+//        Ingredient stoneDust = new Ingredient("stoneDust", "Golden thistle dust crushed to a fine powder for strength potions", hedgehogAlp, 6);
+//
+//        Ingredient saltCrystal = new Ingredient("saltCrystal", "Translucent crystal that never melts, used for preservation and cooling effects", wildWills, 7);
+//        Ingredient nutShell = new Ingredient("nutShell", "Hard shell from forest nuts, crushed for grounding potions", hazelwood, 8);
+//        Ingredient foxberryJuice = new Ingredient("foxberryJuice", "Juice from tiny red berries that freezes water on contact", foxwood, 9);
 
-        Ingredient ashRootSpice = new Ingredient("ashRootSpice", "Red-veined root that stays warm to the touch and adds a spicy kick", ashgrove, 4);
-        Ingredient thornPowder = new Ingredient("thornPowder", "Flaking bark that sparks when scraped, useful for ignition or magic", greasyBog, 5);
-        Ingredient stoneDust = new Ingredient("stoneDust", "Golden thistle dust crushed to a fine powder for strength potions", hedgehogAlp, 6);
+        RawMaterial fern = new RawMaterial("fern", "Green fern plant",
+                chilcroftwood, 200, "secateurs", "fernTips");
+        RawMaterial lavenderBush = new RawMaterial("lavenderBush", "Purple flowering bush",
+                sunfield, 201, "knife", "lavender");
+        RawMaterial messyGrass = new RawMaterial("messyGrass", "Overgrown sweet-smelling grass",
+                stillgrass, 202, "secateurs", "sweetGrass");
 
-        Ingredient saltCrystal = new Ingredient("saltCrystal", "Translucent crystal that never melts, used for preservation and cooling effects", wildWills, 7);
-        Ingredient nutShell = new Ingredient("nutShell", "Hard shell from forest nuts, crushed for grounding potions", hazelwood, 8);
-        Ingredient foxberryJuice = new Ingredient("foxberryJuice", "Juice from tiny red berries that freezes water on contact", foxwood, 9);
+        RawMaterial ashRoot = new RawMaterial("ashRoot", "Thick root buried in ash",
+                ashgrove, 203, "shovel", "ashRootSpice");
+        RawMaterial sharpThorn = new RawMaterial("sharpThorn", "Pointed thorny branch",
+                greasyBog, 204, "sandpaper", "thornPowder");
+        RawMaterial darkStone = new RawMaterial("darkStone", "Heavy dark stone",
+                hedgehogAlp, 205, "sandpaper", "stoneDust");
 
+        RawMaterial saltStone = new RawMaterial("saltStone", "Crystalline salt deposit",
+                wildWills, 206, "pickaxe", "saltCrystal");
+        RawMaterial shinyNut = new RawMaterial("shinyNut", "Hard nut with shiny shell",
+                hazelwood, 207, "pickaxe", "nutShell");
+        RawMaterial foxberry = new RawMaterial("foxberry", "Cluster of tiny red berries",
+                foxwood, 208, "hands", "foxberryJuice");
 
         Recipe morningBloomElixir = new Recipe("morningBloomElixir", "Potion that grants stealth and night vision", sunfield, 1, 3, 0,
                 List.of("fernTips", "lavender", "sweetGrass"));
@@ -146,21 +166,39 @@ public class ZorkULGame {
 //        sunfield.addItem(nutShell);
 //        sunfield.addItem(foxberryJuice);
 
-        chilcroftwood.addItem(fernTips);
-        sunfield.addItem(lavender);
-        stillgrass.addItem(sweetGrass);
+//        chilcroftwood.addItem(fernTips);
+//        sunfield.addItem(lavender);
+//        stillgrass.addItem(sweetGrass);
+//
+//        ashgrove.addItem(ashRootSpice);
+//        greasyBog.addItem(thornPowder);
+//        hedgehogAlp.addItem(stoneDust);
+//
+//        wildWills.addItem(saltCrystal);
+//        hazelwood.addItem(nutShell);
+//        foxwood.addItem(foxberryJuice);
 
-        ashgrove.addItem(ashRootSpice);
-        greasyBog.addItem(thornPowder);
-        hedgehogAlp.addItem(stoneDust);
+        chilcroftwood.addItem(fern);
+        sunfield.addItem(lavenderBush);
+        stillgrass.addItem(messyGrass);
 
-        wildWills.addItem(saltCrystal);
-        hazelwood.addItem(nutShell);
-        foxwood.addItem(foxberryJuice);
+        ashgrove.addItem(ashRoot);
+        greasyBog.addItem(sharpThorn);
+        hedgehogAlp.addItem(darkStone);
+
+        wildWills.addItem(saltStone);
+        hazelwood.addItem(shinyNut);
+        foxwood.addItem(foxberry);
 
         sunfield.addItem(silverRainTonic);
         sunfield.addItem(wardensBrew);
         sunfield.addItem(morningBloomElixir);
+
+        sunfield.addItem(shovel);
+        sunfield.addItem(knife);
+        sunfield.addItem(pickaxe);
+        sunfield.addItem(secateurs);
+        sunfield.addItem(sandpaper);
 
 
         // create the player character and start outside
@@ -208,11 +246,19 @@ public class ZorkULGame {
                 loadGame(command);
                 break;
             case "pick":
+            case "take":
                 takeItem(command);
+                break;
+            case "use":
+                useToolCommand(command);
+                break;
+            case "squeeze":
+                squeezeCommand(command);
                 break;
             case "map":
                 player.showMap();
             case "inventory":
+            case "inv":
                 System.out.println(player.listInventory());
                 break;
             case "drop":
@@ -240,6 +286,33 @@ public class ZorkULGame {
         System.out.println("You are lost. You are alone. You wander around the university.");
         System.out.print("Your command words are: ");
         parser.showCommands();
+    }
+
+    private void useToolCommand(Command command) {
+        if (!command.hasSecondWord()) {
+            System.out.println("Use what? (Format: use <tool> <item>)");
+            return;
+        }
+
+        String[] parts = command.getRemainingWords();
+        if (parts.length < 2) {
+            System.out.println("Use tool on what? (Format: use <tool> <item>)");
+            return;
+        }
+
+        String toolName = parts[0];
+        String itemName = parts[1];
+        player.useTool(toolName, itemName);
+    }
+
+    private void squeezeCommand(Command command) {
+        if (!command.hasSecondWord()) {
+            System.out.println("Squeeze what?");
+            return;
+        }
+
+        String itemName = command.getSecondWord();
+        player.squeezeItem(itemName);
     }
 
     private void takeItem(Command command){
