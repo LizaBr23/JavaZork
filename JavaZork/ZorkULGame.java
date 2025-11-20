@@ -13,11 +13,7 @@ Overall, it recreates the classic Zork interactive fiction experience with a uni
 emphasizing exploration and simple command-driven gameplay
 */
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Arrays;
-
-
 
 public class ZorkULGame {
     private final Parser parser;
@@ -46,8 +42,6 @@ public class ZorkULGame {
         tallWoods = new Room("in the tall woods");
         mapleThick = new Room("in the maple thick");
         chilcroftwood = new Room("in the chilcroftwood");
-
-
 
         // initialise room exits
         sunfield.setExit("east", stillgrass);
@@ -92,23 +86,7 @@ public class ZorkULGame {
         hazelwood.setExit("south", sunfield);
         hazelwood.setExit("east", foxwood);
 
-
-
-
-
         Item beer = new  Item("beer", "Pint of Guinness on the wooden table", pub, 10);
-
-//        Ingredient fernTips = new Ingredient("fernTips", "Dark moss that grows only under moonlight", chilcroftwood, 1);
-//        Ingredient lavender = new Ingredient("lavender", "Pale flower that opens silently at night, releasing a calming scent", sunfield, 2);
-//        Ingredient sweetGrass = new Ingredient("sweetGrass", "Fresh blades of grass with a sweet aroma, ideal for soothing teas", stillgrass, 3);
-//
-//        Ingredient ashRootSpice = new Ingredient("ashRootSpice", "Red-veined root that stays warm to the touch and adds a spicy kick", ashgrove, 4);
-//        Ingredient thornPowder = new Ingredient("thornPowder", "Flaking bark that sparks when scraped, useful for ignition or magic", greasyBog, 5);
-//        Ingredient stoneDust = new Ingredient("stoneDust", "Golden thistle dust crushed to a fine powder for strength potions", hedgehogAlp, 6);
-//
-//        Ingredient saltCrystal = new Ingredient("saltCrystal", "Translucent crystal that never melts, used for preservation and cooling effects", wildWills, 7);
-//        Ingredient nutShell = new Ingredient("nutShell", "Hard shell from forest nuts, crushed for grounding potions", hazelwood, 8);
-//        Ingredient foxberryJuice = new Ingredient("foxberryJuice", "Juice from tiny red berries that freezes water on contact", foxwood, 9);
 
         RawMaterial fern = new RawMaterial("fern", "Green fern plant",
                 chilcroftwood, 200, "secateurs", "fernTips");
@@ -133,10 +111,8 @@ public class ZorkULGame {
 
         Recipe morningBloomElixir = new Recipe("morningBloomElixir", "Potion that grants stealth and night vision", sunfield, 1, 3, 0,
                 List.of("fernTips", "lavender", "sweetGrass"));
-
         Recipe wardensBrew = new Recipe("wardensBrew", "Potion that restores stamina and inner warmth", sunfield, 2, 3, 0,
                 List.of("ashRootSpice", "thornPowder", "stoneDust"));
-
         Recipe silverRainTonic = new Recipe("silverRainTonic", "Potion that grants cold resistance and calm focus", sunfield, 3, 3, 0,
                 List.of("saltCrystal", "nutShell", "foxberryJuice"));
 
@@ -152,31 +128,10 @@ public class ZorkULGame {
         Tool sandpaper = new Sandpaper("sandpaper", "To dig something", sunfield, 3,
                 List.of("thornPowder","stoneDust"));
 
+        NPC bob = new Bob("Bob", pub);
+
         pub.addItem(beer);
-
-//        sunfield.addItem(fernTips);
-//        sunfield.addItem(lavender);
-//        sunfield.addItem(sweetGrass);
-//
-//        sunfield.addItem(ashRootSpice);
-//        sunfield.addItem(thornPowder);
-//        sunfield.addItem(stoneDust);
-//
-//        sunfield.addItem(saltCrystal);
-//        sunfield.addItem(nutShell);
-//        sunfield.addItem(foxberryJuice);
-
-//        chilcroftwood.addItem(fernTips);
-//        sunfield.addItem(lavender);
-//        stillgrass.addItem(sweetGrass);
-//
-//        ashgrove.addItem(ashRootSpice);
-//        greasyBog.addItem(thornPowder);
-//        hedgehogAlp.addItem(stoneDust);
-//
-//        wildWills.addItem(saltCrystal);
-//        hazelwood.addItem(nutShell);
-//        foxwood.addItem(foxberryJuice);
+        pub.addNPC(bob);
 
         chilcroftwood.addItem(fern);
         sunfield.addItem(lavenderBush);
@@ -199,7 +154,6 @@ public class ZorkULGame {
         sunfield.addItem(pickaxe);
         sunfield.addItem(secateurs);
         sunfield.addItem(sandpaper);
-
 
         // create the player character and start outside
         player = new Character(name, sunfield);
@@ -267,6 +221,8 @@ public class ZorkULGame {
             case "recipes":
                 player.checkRecipes();
                 break;
+            case "talk":
+                player.talkToNPC(command);
             case "quit":
                 if (command.hasSecondWord()) {
                     System.out.println("Quit what?");

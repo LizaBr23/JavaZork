@@ -4,9 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Tool extends Item implements Serializable{
+interface Convertible {
+    boolean canUseOn(String rawMaterialName);
+    String getResultIngredient(String rawMaterialName);
+}
+
+public abstract class Tool extends Item implements Serializable, Convertible {
     private static final long serialVersionUID = 4L;
     List<String> usableOn  = new ArrayList<>();
+
     public Tool(String name, String description, Room location, int id) {
         super(name, description, location, id);
     }
@@ -31,9 +37,7 @@ public class Tool extends Item implements Serializable{
         return null;
     }
 
-    protected Map<String, String> getConversionMap() {
-        return new HashMap<>();
-    }
+    protected abstract Map<String, String> getConversionMap();
 
     public List<String> getUsableOn() {
         return usableOn;

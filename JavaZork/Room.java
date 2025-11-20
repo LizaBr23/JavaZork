@@ -8,6 +8,7 @@ public class Room implements Serializable {
     private String description;
     private Map<String, Room> exits;
     private List<Item> items = new ArrayList<>();
+    private List<NPC> npcs = new ArrayList<>();
 
 
     public Room(String description) {
@@ -19,19 +20,33 @@ public class Room implements Serializable {
         items.add(item);
     }
 
+    public void addNPC(NPC npc){
+        npcs.add(npc);
+    }
+
     public List<Item> getItems() {
         return items;
     }
 
+    public List<NPC> getNPCs() {
+        return npcs;
+    }
+
     public String getLongDescription(){
         StringBuilder itemList  = new StringBuilder();
+        StringBuilder npcList = new StringBuilder();
         if(!items.isEmpty()){
-            itemList.append("\nYou see: ");
+            itemList.append("\nYou see: \n");
             for (Item i : items){
                 itemList.append(i.getName()).append(" - ").append(i.getDescription()).append(" \n");
             }
+        }else if(!npcs.isEmpty()){
+            npcList.append("You see: \n");
+            for (NPC n : npcs){
+                npcList.append(n.getName()).append("\n").append(n.getDescription()).append("\n");
+            }
         }
-        return "You are " + description + ".\nExits: " + getExitString() + "\n" + itemList.toString();
+        return "You are " + description + ".\nExits: " + getExitString() + "\n" + itemList.toString() + "\n" + npcList.toString();
     }
 
 

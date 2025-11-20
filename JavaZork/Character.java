@@ -36,6 +36,10 @@ public class Character implements Serializable {
         map.showMap(currentRoom);
     }
 
+    public void talkToNPC(String npcName) {
+
+    }
+
     public void useTool(String toolName, String rawMaterialName) {
         Tool tool = null;
         for (Item item : inventory) {
