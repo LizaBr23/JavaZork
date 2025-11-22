@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.io.Serializable;
 
 public abstract class NPC {
     protected final String NAME;
@@ -26,7 +27,6 @@ class Bob extends NPC {
         description = "Bob the bob\nOld angry man sitting in the pub with no money craving for a beer. Some people say he sells good quality tools which last for decades. However many are afraid of talking to him.";
         sales = new HashMap<>();
     }
-
     @Override
     public void setSales(Map<String, String> sales) {
         sales.put("knife","");

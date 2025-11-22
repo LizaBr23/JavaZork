@@ -39,9 +39,7 @@ public abstract class Tool extends Item implements Serializable, Convertible {
 
     protected abstract Map<String, String> getConversionMap();
 
-    public List<String> getUsableOn() {
-        return usableOn;
-    }
+    public abstract List<String> getUsableOn();
 }
 
 class Shovel extends Tool {
@@ -57,6 +55,11 @@ class Shovel extends Tool {
         Map<String, String> map = new HashMap<>();
         map.put("ashRoot", "ashRootSpice");
         return map;
+    }
+
+    @Override
+    public List<String> getUsableOn() {
+        return usableOn;
     }
 }
 
@@ -75,6 +78,11 @@ class Sandpaper extends Tool {
         map.put("darkStone", "stoneDust");
         return map;
     }
+
+    @Override
+    public List<String> getUsableOn() {
+        return usableOn;
+    }
 }
 
 class Knife extends Tool {
@@ -90,6 +98,11 @@ class Knife extends Tool {
         Map<String, String> map = new HashMap<>();
         map.put("lavenderBush", "lavender");
         return map;
+    }
+
+    @Override
+    public List<String> getUsableOn() {
+        return usableOn;
     }
 }
 
@@ -108,6 +121,11 @@ class Pickaxe extends Tool{
         map.put("shinyNut", "nutShell");
         return map;
     }
+
+    @Override
+    public List<String> getUsableOn() {
+        return usableOn;
+    }
 }
 
 class Secateurs extends Tool {
@@ -124,5 +142,10 @@ class Secateurs extends Tool {
         map.put("fern", "fernTips");
         map.put("messyGrass", "sweetGrass");
         return map;
+    }
+
+    @Override
+    public List<String> getUsableOn() {
+        return usableOn;
     }
 }

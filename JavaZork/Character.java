@@ -38,6 +38,8 @@ public class Character implements Serializable {
 
     public void talkToNPC(String npcName) {
 
+
+
     }
 
     public void useTool(String toolName, String rawMaterialName) {
