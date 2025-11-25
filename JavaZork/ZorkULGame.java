@@ -117,21 +117,21 @@ public class ZorkULGame {
                 List.of("saltCrystal", "nutShell", "foxberryJuice"));
 
 
-        Tool shovel = new Shovel("shovel", "To dig something", sunfield, 3,
-                List.of("ashRootSpice"));
-        Tool knife = new Knife("knife", "Sharp", sunfield, 3,
-                List.of("lavender"));
-        Tool pickaxe = new Pickaxe("pickaxe", "To mine something", sunfield, 3,
-                List.of("saltCrystal", "nutShell"));
-        Tool secateurs = new Secateurs("secateurs", "To cut something", sunfield, 3,
-                List.of("fernTips", "sweetGrass"));
-        Tool sandpaper = new Sandpaper("sandpaper", "To dig something", sunfield, 3,
-                List.of("thornPowder","stoneDust"));
+//        Tool shovel = new Shovel("shovel", "To dig something", sunfield, 3,
+//                List.of("ashRootSpice"));
+//        Tool knife = new Knife("knife", "Sharp", sunfield, 3,
+//                List.of("lavender"));
+//        Tool pickaxe = new Pickaxe("pickaxe", "To mine something", sunfield, 3,
+//                List.of("saltCrystal", "nutShell"));
+//        Tool secateurs = new Secateurs("secateurs", "To cut something", sunfield, 3,
+//                List.of("fernTips", "sweetGrass"));
+//        Tool sandpaper = new Sandpaper("sandpaper", "To dig something", sunfield, 3,
+//                List.of("thornPowder","stoneDust"));
 
-        NPC bob = new Bob("Bob", pub);
+
 
         pub.addItem(beer);
-        pub.addNPC(bob);
+
 
         chilcroftwood.addItem(fern);
         sunfield.addItem(lavenderBush);
@@ -149,11 +149,21 @@ public class ZorkULGame {
         sunfield.addItem(wardensBrew);
         sunfield.addItem(morningBloomElixir);
 
-        sunfield.addItem(shovel);
-        sunfield.addItem(knife);
-        sunfield.addItem(pickaxe);
-        sunfield.addItem(secateurs);
-        sunfield.addItem(sandpaper);
+        NPC bob = new NPC("Bob", pub, new BobDialogueHandler(), "beer");
+        bob.addToInventory("knife", 0);
+        bob.addToInventory("shovel", 0);
+        pub.addNPC(bob);
+
+        NPC alice = new NPC("Alice", tallWoods, new AliceDialogueHandler(), "lavender");
+        alice.addToInventory("pickaxe", 0);
+        alice.addToInventory("secateurs", 0);
+        tallWoods.addNPC(alice);
+
+        NPC markus = new NPC("Markus", greasyBog, new MarkusDialogueHandler(), "foxberryJuice");
+        markus.addToInventory("sandpaper", 0);
+        markus.addToInventory("knife", 0);
+        greasyBog.addNPC(markus);
+
 
         // create the player character and start outside
         player = new Character(name, sunfield);

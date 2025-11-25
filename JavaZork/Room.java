@@ -11,6 +11,7 @@ public class Room implements Serializable {
     private List<NPC> npcs = new ArrayList<>();
 
 
+
     public Room(String description) {
         this.description = description;
         exits = new HashMap<>();
@@ -35,16 +36,17 @@ public class Room implements Serializable {
     public String getLongDescription(){
         StringBuilder itemList  = new StringBuilder();
         StringBuilder npcList = new StringBuilder();
+
         if(!items.isEmpty()){
             itemList.append("\nYou see: \n");
             for (Item i : items){
                 itemList.append(i.getName()).append(" - ").append(i.getDescription()).append(" \n");
             }
-        }else if(!npcs.isEmpty()){
+        }
+        if(!npcs.isEmpty()){
             npcList.append("You see: \n");
             for (NPC n : npcs){
-                npcList.append(n.getName()).append("\n").append(n.getDescription()).append("\n");
-            }
+                npcList.append("  - ").append(n.getName()).append("\n");            }
         }
         return "You are " + description + ".\nExits: " + getExitString() + "\n" + itemList.toString() + "\n" + npcList.toString();
     }
