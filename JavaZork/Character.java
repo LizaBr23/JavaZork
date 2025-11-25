@@ -93,7 +93,7 @@ public class Character implements Serializable {
             System.out.print("> ");
             String input = scanner.nextLine().trim();
 
-            if (input.equalsIgnoreCase("exit") || input == "3") {
+            if (input.equalsIgnoreCase("exit")) {
                 System.out.println("\nYou end the conversation with " + npc.getName() + ".\n");
                 inDialogue = false;
             } else {
@@ -107,11 +107,16 @@ public class Character implements Serializable {
 
                     String response = npc.getDialogueResponse(choice, hasRequiredItem);
                     System.out.println(response);
-
-                    if (choice == 1 && npc.isTalking()) {
+                    if (response.contains("Bob's Shop") || response.contains("Alice's Wares") ||
+                            response.contains("Markus's Inventory")) {
                         showTradeMenu(npc);
                         inDialogue = false;
-                    } else if (!hasRequiredItem) {
+                    }
+                    else if (response.contains("goodbye") || response.contains("farewell") ||
+                            response.contains("You say goodbye")) {
+                        inDialogue = false;  //exit after goodbye response
+                    }
+                    else if (!hasRequiredItem) {
                         //if no beer, exit dialogue
                         inDialogue = false;
                     }
@@ -135,7 +140,9 @@ public class Character implements Serializable {
             int price = npc.getItemPrice(item);
 
             String priceStr;
-            if (price == 0) {
+            if (price == -1) {
+                priceStr = "Item not found";
+            } else if (price == 0) {
                 priceStr = "FREE";
             } else {
                 priceStr = price + " gold";

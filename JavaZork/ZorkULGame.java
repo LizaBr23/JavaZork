@@ -159,10 +159,10 @@ public class ZorkULGame {
         alice.addToInventory("secateurs", 0);
         tallWoods.addNPC(alice);
 
-        NPC markus = new NPC("Markus", greasyBog, new MarkusDialogueHandler(), "foxberryJuice");
-        markus.addToInventory("sandpaper", 0);
-        markus.addToInventory("knife", 0);
-        greasyBog.addNPC(markus);
+//        NPC markus = new NPC("Markus", greasyBog, new MarkusDialogueHandler(), "foxberryJuice");
+//        markus.addToInventory("sandpaper", 0);
+//        markus.addToInventory("knife", 0);
+//        greasyBog.addNPC(markus);
 
 
         // create the player character and start outside
@@ -233,6 +233,7 @@ public class ZorkULGame {
                 break;
             case "talk":
                 player.talkToNPC(command);
+                break;
             case "quit":
                 if (command.hasSecondWord()) {
                     System.out.println("Quit what?");
