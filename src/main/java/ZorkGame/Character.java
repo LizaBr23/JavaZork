@@ -16,7 +16,7 @@ public class Character implements Serializable {
 
     private final String name;
     private Room currentRoom;
-    private List<Item> inventory = new ArrayList<>();
+    private GenericClass<Item> inventory = new GenericClass<>();
     private GameMap map;
 
     public Character(String name, Room startingRoom) {
@@ -51,16 +51,9 @@ public class Character implements Serializable {
         }
 
         String npcName = command.getSecondWord();
-        List<NPC> npcs = currentRoom.getNPCs();
+        GenericClass<NPC> npcCollection = new GenericClass<>(currentRoom.getNPCs());
 
-        //find the NPC
-        NPC targetNPC = null;
-        for (NPC npc : npcs) {
-            if (npc.getName().equalsIgnoreCase(npcName)) {
-                targetNPC = npc;
-                break;
-            }
-        }
+        NPC targetNPC = npcCollection.findByName(npcName);
 
         if (targetNPC == null) {
             System.out.println("There's no one named " + npcName + " here.");
@@ -229,7 +222,7 @@ public class Character implements Serializable {
 
     //check for a specific item
     public boolean hasItem(String itemName) {
-        for (Item item : inventory) {
+        for (Item item : inventory.getAll()) {
             if (item.getName().equalsIgnoreCase(itemName)) {
                 return true;
             }
@@ -239,27 +232,15 @@ public class Character implements Serializable {
 
 
     public void useTool(String toolName, String rawMaterialName) {
-        Tool tool = null;
-        for (Item item : inventory) {
-            if (item instanceof Tool && item.getName().equalsIgnoreCase(toolName)) {
-                tool = (Tool) item;
-                break;
-            }
-        }
+        Tool tool = inventory.findByTypeAndName(Tool.class, toolName);
 
         if (tool == null) {
             System.out.println("You don't have a " + toolName + ".");
             return;
         }
 
-        RawMaterial rawMaterial = null;
-        for (Item item : currentRoom.getItems()) {
-            if (item instanceof RawMaterial &&
-                    item.getName().equalsIgnoreCase(rawMaterialName)) {
-                rawMaterial = (RawMaterial) item;
-                break;
-            }
-        }
+        GenericClass<Item> roomItems = new GenericClass<>(currentRoom.getItems());
+        RawMaterial rawMaterial = roomItems.findByTypeAndName(RawMaterial.class, rawMaterialName);
 
         if (rawMaterial == null) {
             System.out.println("There's no " + rawMaterialName + " here.");
@@ -291,14 +272,8 @@ public class Character implements Serializable {
     }
 
     public void squeezeItem(String itemName) {
-        // Find the item in the room
-        Item foundItem = null;
-        for (Item item : currentRoom.getItems()) {
-            if (item.getName().toLowerCase().contains(itemName.toLowerCase())) {
-                foundItem = item;
-                break;
-            }
-        }
+        GenericClass<Item> roomItems = new GenericClass<>(currentRoom.getItems());
+        Item foundItem = roomItems.findByPartialName(itemName);
 
         if (foundItem == null) {
             System.out.println("There's no " + itemName + " here to squeeze.");
@@ -331,13 +306,7 @@ public class Character implements Serializable {
             return;
         }
 
-        Item itemToDrop = null;
-        for (Item item : inventory) {
-            if (item.getName().equalsIgnoreCase(itemName)) {
-                itemToDrop = item;
-                break;
-            }
-        }
+        Item itemToDrop = inventory.findByName(itemName);
 
         if (itemToDrop != null) {
 
@@ -345,13 +314,11 @@ public class Character implements Serializable {
                 System.out.println("You can't drop a recipe! You need it to complete your quest.");
                 return;
             }
-            //add in a new pattern variable at the end to use further instead of creating it manually on the next line
-            if (itemToDrop instanceof Ingredient ingredient) {
 
-                for (Item item : inventory) {
-                    if (item instanceof Recipe recipe) {
-                        recipe.removeIngredient(ingredient.getName());
-                    }
+            if (itemToDrop instanceof Ingredient ingredient) {
+                List<Recipe> recipes = inventory.findAllByType(Recipe.class);
+                for (Recipe recipe : recipes) {
+                    recipe.removeIngredient(ingredient.getName());
                 }
             }
 
@@ -359,20 +326,14 @@ public class Character implements Serializable {
             roomItems.add(itemToDrop);
             System.out.println("You dropped the " + itemToDrop.getName() + ".");
         } else {
-            System.out.println("You don’t have that item.");
+            System.out.println("You don't have that item.");
         }
     }
 
     public void takeItem(String itemName){
         List<Item> roomItems = currentRoom.getItems();
-        Item foundItem = null;
-
-        for(Item item : roomItems){
-            if(item.getName().toLowerCase().contains(itemName.toLowerCase())){
-                foundItem = item;
-                break;
-            }
-        }
+        GenericClass<Item> roomItemsCollection = new GenericClass<>(roomItems);
+        Item foundItem = roomItemsCollection.findByPartialName(itemName);
 
         if(foundItem != null){
             inventory.add(foundItem);
@@ -383,11 +344,9 @@ public class Character implements Serializable {
 
             if (foundItem instanceof Recipe newRecipe) {
 
-                // Check if we already have ingredients for this recipe in inventory
-                for (Item item : inventory) {
-                    if (item instanceof Ingredient ingredient) {
-                        newRecipe.addIngredient(ingredient.getName());
-                    }
+                List<Ingredient> ingredients = inventory.findAllByType(Ingredient.class);
+                for (Ingredient ingredient : ingredients) {
+                    newRecipe.addIngredient(ingredient.getName());
                 }
 
                 // Check if this recipe is now complete
@@ -404,15 +363,12 @@ public class Character implements Serializable {
 
             } else if (foundItem instanceof Ingredient ingredient) {
 
-                // Update all recipes that need this ingredient
-                for (Item item : inventory){
-                    if (item instanceof Recipe recipe) {
-                        if (recipe.addIngredient(ingredient.getName())) {
-                            // Check if THIS recipe is now complete
-                            if(recipe.getCollected() >= recipe.getIngredients()) {
-                                completedRecipe = true;
-                                completedRecipeName = recipe.getName();
-                            }
+                List<Recipe> recipes = inventory.findAllByType(Recipe.class);
+                for (Recipe recipe : recipes) {
+                    if (recipe.addIngredient(ingredient.getName())) {
+                        if(recipe.getCollected() >= recipe.getIngredients()) {
+                            completedRecipe = true;
+                            completedRecipeName = recipe.getName();
                         }
                     }
                 }
@@ -427,16 +383,14 @@ public class Character implements Serializable {
                 System.out.println("\nYou picked up " + foundItem.getName() + ".\n");
             }
 
-            // Check if ALL recipes are complete
+            List<Recipe> allRecipes = inventory.findAllByType(Recipe.class);
             boolean allRecipesComplete = true;
-            int recipeCount = 0;
-            for (Item item : inventory) {
-                if (item instanceof Recipe recipe) {
-                    recipeCount++;
-                    if (recipe.getCollected() < recipe.getIngredients()) {
-                        allRecipesComplete = false;
-                        break;
-                    }
+            int recipeCount = allRecipes.size();
+
+            for (Recipe recipe : allRecipes) {
+                if (recipe.getCollected() < recipe.getIngredients()) {
+                    allRecipesComplete = false;
+                    break;
                 }
             }
 
@@ -458,7 +412,7 @@ public class Character implements Serializable {
         else{
             // Count items
             Map<String, Integer> itemCounts = new HashMap<>();
-            for(Item item : inventory){
+            for(Item item : inventory.getAll()){
                 String itemName = item.getName();
                 itemCounts.put(itemName, itemCounts.getOrDefault(itemName, 0) + 1);
             }
@@ -480,39 +434,24 @@ public class Character implements Serializable {
     }
 
     public void checkRecipes() {
-        boolean hasRecipes = false;
+        List<Recipe> recipes = inventory.findAllByType(Recipe.class);
         System.out.println("\n=== Recipe Progress ===");
 
-        for (Item item : inventory) {
-            if (item instanceof Recipe recipe) {
-                hasRecipes = true;
-                System.out.println(recipe.getName() + ": " +
-                        recipe.getCollected() + "/" + recipe.getIngredients() + " ingredients collected");
+        for (Recipe recipe : recipes) {
+            System.out.println(recipe.getName() + ": " +
+                    recipe.getCollected() + "/" + recipe.getIngredients() + " ingredients collected");
 
-                System.out.print("  Needs: ");
-                for (String ing : recipe.getIngredient()) {
-                    System.out.print(ing + " ");
-                }
-                System.out.println();
+            System.out.print("  Needs: ");
+            for (String ing : recipe.getIngredient()) {
+                System.out.print(ing + " ");
             }
+            System.out.println();
         }
 
-        if (!hasRecipes) {
+        if (recipes.isEmpty()) {
             System.out.println("You don't have any recipes yet.");
         }
         System.out.println();
     }
-
-    public void move(String direction) {
-        Room nextRoom = currentRoom.getExit(direction);
-        if (nextRoom != null) {
-            currentRoom = nextRoom;
-            System.out.println("You moved to: " + currentRoom.getDescription());
-        } else {
-            System.out.println("You can't go that way!");
-        }
-    }
-
-
 }
 

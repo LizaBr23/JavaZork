@@ -3,14 +3,13 @@ package ZorkGame;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Room implements Serializable {
     private String description;
     private Map<Direction, Room> exits;
-    private List<Item> items = new ArrayList<>();
-    private List<NPC> npcs = new ArrayList<>();
+    private GenericClass<Item> items = new GenericClass<>();
+    private GenericClass<NPC> npcs = new GenericClass<>();
 
 
 
@@ -28,11 +27,11 @@ public class Room implements Serializable {
     }
 
     public List<Item> getItems() {
-        return items;
+        return items.getAll();
     }
 
     public List<NPC> getNPCs() {
-        return npcs;
+        return npcs.getAll();
     }
 
     public String getLongDescription(){
@@ -41,13 +40,13 @@ public class Room implements Serializable {
 
         if(!items.isEmpty()){
             itemList.append("\nYou see: \n");
-            for (Item i : items){
+            for (Item i : items.getAll()){
                 itemList.append(i.getName()).append(" - ").append(i.getDescription()).append(" \n");
             }
         }
         if(!npcs.isEmpty()){
             npcList.append("You see: \n");
-            for (NPC n : npcs){
+            for (NPC n : npcs.getAll()){
                 npcList.append("  - ").append(n.getName()).append("\n");            }
         }
         return "You are " + description + ".\nExits: " + getExitString() + "\n" + itemList.toString() + "\n" + npcList.toString();
