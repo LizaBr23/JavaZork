@@ -9,7 +9,6 @@ import ZorkGame.networking.NetworkProtocol.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -82,7 +81,6 @@ public class MultiplayerGameServer {
                 MultiplayerClientHandler handler = new MultiplayerClientHandler(clientSocket, playerId, this);
                 clients.put(playerId, handler);
                 clientExecutor.submit(handler);
-            } catch (SocketTimeoutException e) {
             } catch (IOException e) {
             }
         }
@@ -101,21 +99,14 @@ public class MultiplayerGameServer {
     }
 
     private String executeCommandForPlayer(Character player, Command command) {
-        switch (command.getCommandType()) {
-            case GO:
-                return handlePlayerMove(player, command.getSecondWord());
-            case TAKE:
-                return handlePlayerTake(player, command.getSecondWord());
-            case DROP:
-                return handlePlayerDrop(player, command.getSecondWord());
-            case INVENTORY:
-            case INV:
-                return player.listInventory();
-            case HELP:
-                return "go/take/drop/inventory/help";
-            default:
-                return "Not supported";
-        }
+        return switch (command.getCommandType()) {
+            case GO -> handlePlayerMove(player, command.getSecondWord());
+            case TAKE -> handlePlayerTake(player, command.getSecondWord());
+            case DROP -> handlePlayerDrop(player, command.getSecondWord());
+            case INVENTORY, INV -> player.listInventory();
+            case HELP -> "go/take/drop/inventory/help";
+            default -> "Not supported";
+        };
     }
 
     private String handlePlayerMove(Character player, String direction) {
@@ -197,8 +188,6 @@ public class MultiplayerGameServer {
         clientExecutor.shutdown();
         try { if (serverSocket != null) serverSocket.close(); } catch (Exception e) {}
     }
-
-    public boolean isRunning() { return running; }
 
     public static void main(String[] args) {
         int port = DEFAULT_PORT;

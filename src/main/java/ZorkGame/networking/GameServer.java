@@ -4,7 +4,6 @@ import ZorkGame.networking.NetworkProtocol.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -30,10 +29,6 @@ public class GameServer {
         this.clientExecutor = Executors.newCachedThreadPool();
         this.nextPlayerId = 1;
         this.running = false;
-    }
-
-    public GameServer() {
-        this(DEFAULT_PORT, MAX_PLAYERS);
     }
 
     public void start() {
@@ -68,7 +63,6 @@ public class GameServer {
                 ClientHandler clientHandler = new ClientHandler(clientSocket, playerId, this);
                 clients.add(clientHandler);
                 clientExecutor.submit(clientHandler);
-            } catch (SocketTimeoutException e) {
             } catch (IOException e) {
             }
         }
@@ -82,16 +76,8 @@ public class GameServer {
         }
     }
 
-    public void broadcastMessage(Message message) {
-        broadcastMessage(message, null);
-    }
-
     public void removeClient(ClientHandler client) {
         clients.remove(client);
-    }
-
-    public int getPlayerCount() {
-        return clients.size();
     }
 
     public void stop() {
@@ -105,10 +91,6 @@ public class GameServer {
 
         clientExecutor.shutdown();
         try { if (serverSocket != null) serverSocket.close(); } catch (Exception e) {}
-    }
-
-    public boolean isRunning() {
-        return running;
     }
 
     public static void main(String[] args) {

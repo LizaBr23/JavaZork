@@ -40,11 +40,11 @@ public class MultiplayerClient {
             running = true;
 
             Thread receiverThread = new Thread(this::receiveMessages);
-            receiverThread.setDaemon(true);
+            receiverThread.setDaemon(false);
             receiverThread.start();
 
             Thread senderThread = new Thread(this::sendMessages);
-            senderThread.setDaemon(true);
+            senderThread.setDaemon(false);
             senderThread.start();
 
             return true;
@@ -54,27 +54,40 @@ public class MultiplayerClient {
     }
 
     public void startGameLoop() {
-        Scanner scanner = new Scanner(System.in);
 
-        while (playerId == null && running) {
-            try { Thread.sleep(100); } catch (Exception e) {}
-        }
-
-        if (playerId == null) return;
-
-        while (running) {
-            System.out.print("> ");
-            String input = scanner.nextLine().trim();
-            if (input.isEmpty()) continue;
-
-            if (input.startsWith("/")) {
-                handleClientCommand(input);
-                continue;
+        try (Scanner scanner = new Scanner(System.in)) {
+            while (playerId == null && running) {
+                try {
+                    Thread.sleep(100);
+                } catch (Exception ignored) {
+                }
             }
+            if (playerId == null) {
+                System.err.println("Failed to connect to server");
+                disconnect();
+                return;
+            }
+            System.out.println("Connected! Type commands or /quit to exit.");
+            while (running) {
+                System.out.print("> ");
+                if (!scanner.hasNextLine()) {
+                    break;
+                }
+                String input = scanner.nextLine().trim();
+                if (input.isEmpty()) continue;
 
-            sendMessage(new Message(MessageType.PLAYER_ACTION, playerId, input));
+                if (input.startsWith("/")) {
+                    handleClientCommand(input);
+                    continue;
+                }
+
+                sendMessage(new Message(MessageType.PLAYER_ACTION, playerId, input));
+            }
+        } catch (Exception e) {
+            System.err.println("Input error: " + e.getMessage());
+        } finally {
+            disconnect();
         }
-        scanner.close();
     }
 
     private void handleClientCommand(String input) {
@@ -176,10 +189,6 @@ public class MultiplayerClient {
         try { if (in != null) in.close(); } catch (Exception e) {}
         try { if (out != null) out.close(); } catch (Exception e) {}
         try { if (socket != null) socket.close(); } catch (Exception e) {}
-    }
-
-    public boolean isConnected() {
-        return running && socket != null && !socket.isClosed();
     }
 
     public static void main(String[] args) {

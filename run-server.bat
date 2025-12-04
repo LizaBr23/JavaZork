@@ -13,4 +13,4 @@ echo Port: %PORT%
 echo Max Players: %MAX_PLAYERS%
 echo.
 
-mvn exec:java -Dexec.mainClass="ZorkGame.networking.MultiplayerGameServer" -Dexec.args="%PORT% %MAX_PLAYERS%"
+mvn exec:java@run-server -Dexec.args="%PORT% %MAX_PLAYERS%"

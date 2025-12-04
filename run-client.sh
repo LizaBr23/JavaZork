@@ -9,4 +9,4 @@ echo "Starting JavaZork Multiplayer Client..."
 echo "Connecting to: $HOST:$PORT"
 echo ""
 
-mvn exec:java -Dexec.mainClass="ZorkGame.networking.MultiplayerClient" -Dexec.args="$HOST $PORT"
+mvn exec:java@run-client -Dexec.args="$HOST $PORT"

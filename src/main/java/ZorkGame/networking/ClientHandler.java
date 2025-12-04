@@ -89,10 +89,6 @@ public class ClientHandler implements Runnable {
         outgoingMessages.offer(message);
     }
 
-    public String getPlayerId() {
-        return playerId;
-    }
-
     public boolean isRunning() {
         return running && !socket.isClosed();
     }

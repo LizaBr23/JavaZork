@@ -32,10 +32,6 @@ public class NetworkClient {
         this.outgoingMessages = new LinkedBlockingQueue<>();
     }
 
-    public NetworkClient() {
-        this(DEFAULT_HOST, DEFAULT_PORT);
-    }
-
     public boolean connect() {
         try {
             socket = new Socket(host, port);
@@ -87,7 +83,7 @@ public class NetworkClient {
                     disconnect();
                     break;
                 }
-                notifyPlayerAction(input);
+                notifyPlayerAction();
             }
         }
         scanner.close();
@@ -115,7 +111,7 @@ public class NetworkClient {
         sendMessage(new Message(MessageType.CHAT_MESSAGE, playerId, message));
     }
 
-    private void notifyPlayerAction(String action) {
+    private void notifyPlayerAction() {
         String roomDesc = game.getPlayer().getCurrentRoom().getDescription();
         sendMessage(new Message(MessageType.PLAYER_MOVE, playerId, roomDesc));
     }
@@ -186,10 +182,6 @@ public class NetworkClient {
         try { if (in != null) in.close(); } catch (Exception e) {}
         try { if (out != null) out.close(); } catch (Exception e) {}
         try { if (socket != null) socket.close(); } catch (Exception e) {}
-    }
-
-    public boolean isConnected() {
-        return running && socket != null && !socket.isClosed();
     }
 
     public static void main(String[] args) {

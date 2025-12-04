@@ -21,10 +21,6 @@ public class Parser {
     }
 
     public Command getCommand() {
-        if (scanner == null) {
-            throw new IllegalStateException("Parser was created in GUI mode - use parseCommandString() instead");
-        }
-
         System.out.print("> ");
         String inputLine = scanner.nextLine();
 

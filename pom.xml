@@ -87,11 +87,21 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
+                <configuration>
+                    <mainClass>ZorkGame.game.Main</mainClass>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>default-cli</id>
+                        <id>run-server</id>
                         <configuration>
-                            <mainClass>ZorkGame.game.Main</mainClass>
+                            <mainClass>ZorkGame.networking.MultiplayerGameServer</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>run-client</id>
+                        <configuration>
+                            <mainClass>ZorkGame.networking.MultiplayerClient</mainClass>
+                            <cleanupDaemonThreads>false</cleanupDaemonThreads>
                         </configuration>
                     </execution>
                     <execution>
