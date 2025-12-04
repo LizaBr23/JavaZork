@@ -35,6 +35,9 @@ import ZorkGame.threading.NPCMovementThread;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.Queue;
+import java.util.LinkedList;
+import java.util.HashSet;
 
 
 public class ZorkULGame {
@@ -52,26 +55,20 @@ public class ZorkULGame {
     }
 
     private void initializeThreading() {
-        // Initialize event manager for timed events
         eventManager = new TimedEventManager();
         npcThreads = new ArrayList<>();
 
-        // Schedule periodic hint event (every 2 minutes)
-        HintEvent hintEvent = new HintEvent(player, 120000); // 120000ms = 2 minutes
+        HintEvent hintEvent = new HintEvent(player, 120000);
         eventManager.scheduleRepeating(hintEvent);
 
-        // Start NPC movement threads
         startNPCMovement();
     }
 
     private void startNPCMovement() {
-        // Get all rooms for NPC movement
         List<Room> allRooms = getAllRooms();
 
-        // Find Bob and start his movement thread
         for (Room room : allRooms) {
             for (NPC npc : room.getNPCs()) {
-                // Create movement thread for each NPC (moves every 45 seconds)
                 NPCMovementThread movementThread = new NPCMovementThread(npc, allRooms, 45000);
                 movementThread.start();
                 npcThreads.add(movementThread);
@@ -83,9 +80,8 @@ public class ZorkULGame {
         List<Room> rooms = new ArrayList<>();
         Room currentRoom = player.getCurrentRoom();
 
-        // Traverse all connected rooms using BFS
-        Set<Room> visited = new java.util.HashSet<>();
-        java.util.Queue<Room> queue = new java.util.LinkedList<>();
+        Set<Room> visited = new HashSet<>();
+        Queue<Room> queue = new LinkedList<>();
         queue.add(currentRoom);
         visited.add(currentRoom);
 
@@ -93,7 +89,6 @@ public class ZorkULGame {
             Room room = queue.poll();
             rooms.add(room);
 
-            // Check all directions
             for (Direction direction : Direction.values()) {
                 Room neighbor = room.getExit(direction.getDirectionName());
                 if (neighbor != null && !visited.contains(neighbor)) {
@@ -107,14 +102,12 @@ public class ZorkULGame {
     }
 
     public void shutdown() {
-        // Stop all NPC movement threads
         if (npcThreads != null) {
             for (NPCMovementThread thread : npcThreads) {
                 thread.stopMovement();
             }
         }
 
-        // Shutdown event manager
         if (eventManager != null) {
             eventManager.shutdown();
         }
@@ -242,7 +235,6 @@ public class ZorkULGame {
         sunfield.addNPC(alice);
 
 
-        // create the player character and start outside
         player = new Character(name, sunfield);
     }
 
@@ -463,7 +455,7 @@ public class ZorkULGame {
             player.setCurrentRoom(nextRoom);
             System.out.println(player.getCurrentRoom().getLongDescription());
             System.out.println("\nYour score is "+ player.getCoins());
-            player.checkExplorerAchievement(12); // 12 total rooms
+            player.checkExplorerAchievement(12);
         }
     }
 }

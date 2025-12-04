@@ -15,7 +15,6 @@ abstract class AbstractTool extends Item implements Convertible, Serializable {
         super(name, description, location, id);
     }
 
-    // Check if this tool can be used on the raw material
     @Override
     public boolean canUseOn(String rawMaterialName) {
         for (String material : conversionMap.keySet()) {
@@ -26,7 +25,6 @@ abstract class AbstractTool extends Item implements Convertible, Serializable {
         return false;
     }
 
-    // Get the resulting ingredient after using tools
     @Override
     public String getResultIngredient(String rawMaterialName) {
         for (Map.Entry<String, String> entry : conversionMap.entrySet()) {

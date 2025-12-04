@@ -243,7 +243,6 @@ public class Character implements GameEntity, Locatable, Serializable {
                 String input = scanner.nextLine().trim();
                 int choice = Integer.parseInt(input);
 
-                //Validating choice
                 if (choice == itemList.size() + 1) {
                     System.out.println("You leave the shop.\n");
                     inShop = false;
