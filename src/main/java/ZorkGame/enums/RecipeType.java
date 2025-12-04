@@ -27,40 +27,23 @@ public enum RecipeType {
         List.of("saltCrystal", "nutShell", "foxberryJuice")
     );
 
-    private final String name;
-    private final String description;
-    private final int ingredientCount;
-    private final int alreadyCollected;
-    private final List<String> requiredIngredients;
+    private final String NAME;
+    private final String DESCRIPTION;
+    private final int INGREDIENT_COUNT;
+    private final int ALREADY_COLLECTED;
+    private final List<String> REQUIRED_INGREDIENTS;
 
     RecipeType(String name, String description, int ingredientCount, int alreadyCollected, List<String> requiredIngredients) {
-        this.name = name;
-        this.description = description;
-        this.ingredientCount = ingredientCount;
-        this.alreadyCollected = alreadyCollected;
-        this.requiredIngredients = requiredIngredients;
-    }
-
-    public String getRecipeName() {
-        return name;
+        this.NAME = name;
+        this.DESCRIPTION = description;
+        this.INGREDIENT_COUNT = ingredientCount;
+        this.ALREADY_COLLECTED = alreadyCollected;
+        this.REQUIRED_INGREDIENTS = requiredIngredients;
     }
 
     public String getDescription() {
-        return description;
+        return DESCRIPTION;
     }
-
-    public int getIngredientCount() {
-        return ingredientCount;
-    }
-
-    public int getAlreadyCollected() {
-        return alreadyCollected;
-    }
-
-    public List<String> getRequiredIngredients() {
-        return requiredIngredients;
-    }
-
 
     public static RecipeType fromString(String text) {
         if (text == null) {
@@ -70,8 +53,8 @@ public enum RecipeType {
         String normalized = text.toLowerCase().trim();
 
         for (RecipeType type : RecipeType.values()) {
-            if (type.name.equalsIgnoreCase(text) ||
-                type.name.toLowerCase().equals(normalized)) {
+            if (type.NAME.equalsIgnoreCase(text) ||
+                type.NAME.toLowerCase().equals(normalized)) {
                 return type;
             }
         }
@@ -79,6 +62,6 @@ public enum RecipeType {
     }
 
     public Recipe createRecipe(Room location) {
-        return new Recipe(name, description, location, ordinal() + 1, ingredientCount, alreadyCollected, requiredIngredients);
+        return new Recipe(NAME, DESCRIPTION, location, ordinal() + 1, INGREDIENT_COUNT, ALREADY_COLLECTED, REQUIRED_INGREDIENTS);
     }
 }

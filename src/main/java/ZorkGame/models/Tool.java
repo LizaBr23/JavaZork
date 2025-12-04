@@ -3,7 +3,7 @@ package ZorkGame.models;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
-import ZorkGame.enums.ItemCategory;
+
 
 abstract class AbstractTool extends Item implements Convertible, Serializable {
     @Serial
@@ -40,7 +40,6 @@ abstract class AbstractTool extends Item implements Convertible, Serializable {
         return null;
     }
 
-    public abstract Map<String, String> getConversionMap();
 }
 
 public class Tool extends AbstractTool {
@@ -51,24 +50,5 @@ public class Tool extends AbstractTool {
                 Map<String, String> conversionMap) {
         super(name, description, location, id);
         this.conversionMap = conversionMap;
-    }
-
-    @Override
-    public Map<String, String> getConversionMap() {
-        return conversionMap;
-    }
-
-    @Override
-    public ItemCategory getCategory() {
-        return ItemCategory.TOOL;
-    }
-
-    @Override
-    public boolean canBeTaken() {
-        return true;
-    }
-
-    @Override
-    public void onPickup(Character player) {
     }
 }

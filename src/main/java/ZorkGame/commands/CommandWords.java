@@ -5,7 +5,7 @@ import ZorkGame.enums.CommandType;
 public class CommandWords {
 
     public boolean isCommand(String commandWord) {
-        return CommandType.fromString(commandWord) != null;
+        return CommandType.fromString(commandWord) == null;
     }
 
     public void showAll() {

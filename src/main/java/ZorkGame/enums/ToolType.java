@@ -37,32 +37,20 @@ public enum ToolType {
         Map.of("sharpThorn", "thornPowder", "darkStone", "stoneDust")
     );
 
-    private final String name;
-    private final String description;
-    private final int id;
-    private final Map<String, String> conversionMap;
+    private final String NAME;
+    private final String DESCRIPTION;
+    private final int ID;
+    private final Map<String, String> CONVERSION_MAP;
 
     ToolType(String name, String description, int id, Map<String, String> conversionMap) {
-        this.name = name;
-        this.description = description;
-        this.id = id;
-        this.conversionMap = conversionMap;
-    }
-
-    public String getToolName() {
-        return name;
+        this.NAME = name;
+        this.DESCRIPTION = description;
+        this.ID = id;
+        this.CONVERSION_MAP = conversionMap;
     }
 
     public String getDescription() {
-        return description;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public Map<String, String> getConversionMap() {
-        return conversionMap;
+        return DESCRIPTION;
     }
 
     public static ToolType fromString(String text) {
@@ -71,7 +59,7 @@ public enum ToolType {
         }
 
         for (ToolType type : ToolType.values()) {
-            if (type.name.equalsIgnoreCase(text)) {
+            if (type.NAME.equalsIgnoreCase(text)) {
                 return type;
             }
         }
@@ -79,6 +67,6 @@ public enum ToolType {
     }
 
     public Tool createTool(Room location) {
-        return new Tool(name, description, location, id, conversionMap);
+        return new Tool(NAME, DESCRIPTION, location, ID, CONVERSION_MAP);
     }
 }

@@ -16,22 +16,23 @@ public enum CommandType {
     MAP("map", "Show map of the world"),
     USE("use", "Use a tool"),
     SQUEEZE("squeeze", "Make juice out of something"),
-    TALK("talk", "Talk to an NPC");
+    TALK("talk", "Talk to an NPC"),
+    ACHIEVEMENTS("achievements", "Show your achievements");
 
-    private final String commandWord;
-    private final String description;
+    private final String COMMAND_WORD;
+    private final String DESCRIPTION;
 
     CommandType(String commandWord, String description) {
-        this.commandWord = commandWord;
-        this.description = description;
+        this.COMMAND_WORD = commandWord;
+        this.DESCRIPTION = description;
     }
 
     public String getCommandWord() {
-        return commandWord;
+        return COMMAND_WORD;
     }
 
     public String getDescription() {
-        return description;
+        return DESCRIPTION;
     }
 
 
@@ -47,7 +48,7 @@ public enum CommandType {
         }
 
         for (CommandType type : CommandType.values()) {
-            if (type.commandWord.equalsIgnoreCase(text)) {
+            if (type.COMMAND_WORD.equalsIgnoreCase(text)) {
                 return type;
             }
         }
@@ -105,7 +106,7 @@ public enum CommandType {
 
         if (normalized.length() >= 2) {
             for (CommandType type : CommandType.values()) {
-                if (type.commandWord.startsWith(normalized)) {
+                if (type.COMMAND_WORD.startsWith(normalized)) {
                     return type;
                 }
             }

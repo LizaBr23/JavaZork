@@ -5,15 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
-import ZorkGame.enums.ItemCategory;
 
 public class Recipe extends Item {
     @Serial
     private static final long serialVersionUID = 1L;
     private final int ingredients;
     private int collected;
-    private List<String> ingredient = new ArrayList<>();
-    private Set<String> collectedIngredients = new HashSet<>();
+    private List<String> ingredient;
+    private final Set<String> COLLECTED_iNGREDIENTS;
     private static int recepies;
 
     public Recipe(String name, String description, Room location, int id, int ingredients, int collected, List<String> ingredient) {
@@ -21,38 +20,28 @@ public class Recipe extends Item {
         this.ingredients = ingredients;
         this.collected = collected;
         this.ingredient = ingredient;
+        this.COLLECTED_iNGREDIENTS = new HashSet<>();
+        this.ingredient = new ArrayList<>();
         recepies++;
     }
 
     public static int getNumRecipes(){return recepies;}
 
     public boolean addIngredient(String ingredientName) {
-        if (ingredient.contains(ingredientName) && !collectedIngredients.contains(ingredientName)) {
-            collectedIngredients.add(ingredientName);
+        if (ingredient.contains(ingredientName) && !COLLECTED_iNGREDIENTS.contains(ingredientName)) {
+            COLLECTED_iNGREDIENTS.add(ingredientName);
             this.collected++;
             return true;
         }
         return false;
     }
 
-    public boolean removeIngredient(String ingredientName) {
-        if (collectedIngredients.contains(ingredientName)) {
-            collectedIngredients.remove(ingredientName);
+    public void removeIngredient(String ingredientName) {
+        if (COLLECTED_iNGREDIENTS.contains(ingredientName)) {
+            COLLECTED_iNGREDIENTS.remove(ingredientName);
             if (this.collected > 0) {
                 this.collected--;
             }
-            return true;
-        }
-        return false;
-    }
-
-    public void incrementCollected(){
-        this.collected++;
-    }
-
-    public void decrementCollected(){
-        if(this.collected > 0) {
-            this.collected--;
         }
     }
 
@@ -65,18 +54,4 @@ public class Recipe extends Item {
     }
 
     public List<String> getIngredient() {return ingredient;}
-
-    @Override
-    public ItemCategory getCategory() {
-        return ItemCategory.RECIPE;
-    }
-
-    @Override
-    public boolean canBeTaken() {
-        return true;
-    }
-
-    @Override
-    public void onPickup(Character player) {
-    }
 }

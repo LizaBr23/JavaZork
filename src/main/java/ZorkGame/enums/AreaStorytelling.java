@@ -51,27 +51,14 @@ public enum AreaStorytelling {
     );
 
 
-    private final String description;
+    private final String DESCRIPTION;
 
     AreaStorytelling(String description) {
-        this.description = description;
+        this.DESCRIPTION = description;
     }
 
     public String getDescription() {
-        return description;
-    }
-
-    public static AreaStorytelling fromString(String text) {
-        if (text == null) {
-            return null;
-        }
-
-        for (AreaStorytelling type : AreaStorytelling.values()) {
-            if (type.description.equalsIgnoreCase(text)) {
-                return type;
-            }
-        }
-        return null;
+        return DESCRIPTION;
     }
 
 }

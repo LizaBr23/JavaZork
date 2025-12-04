@@ -23,14 +23,12 @@ import ZorkGame.utils.GameSaver;
 import ZorkGame.dialogue.GenericDialogHandler;
 import ZorkGame.enums.Direction;
 import ZorkGame.enums.NPCType;
-import ZorkGame.enums.RecipeType;
 import ZorkGame.models.Character;
-import ZorkGame.models.Item;
 import ZorkGame.models.GenericItem;
 import ZorkGame.models.NPC;
 import ZorkGame.models.RawMaterial;
 import ZorkGame.models.Room;
-import java.util.List;
+
 
 public class ZorkULGame {
     private final Parser parser;
@@ -107,50 +105,25 @@ public class ZorkULGame {
         GenericItem grapes = new GenericItem("grapes", "Mysterious grapes which attract fairies", pub, 10);
 
         RawMaterial fern = new RawMaterial("fern", "Green fern plant",
-                chilcroftwood, 200, "secateurs", "fernTips");
+                chilcroftwood, 200, "fernTips");
         RawMaterial lavenderBush = new RawMaterial("lavenderBush", "Purple flowering bush",
-                sunfield, 201, "knife", "lavender");
+                sunfield, 201, "lavender");
         RawMaterial messyGrass = new RawMaterial("messyGrass", "Overgrown sweet-smelling grass",
-                stillgrass, 202, "secateurs", "sweetGrass");
+                stillgrass, 202, "sweetGrass");
 
         RawMaterial ashRoot = new RawMaterial("ashRoot", "Thick root buried in ash",
-                ashgrove, 203, "shovel", "ashRootSpice");
+                ashgrove, 203, "ashRootSpice");
         RawMaterial sharpThorn = new RawMaterial("sharpThorn", "Pointed thorny branch",
-                greasyBog, 204, "sandpaper", "thornPowder");
+                greasyBog, 204, "thornPowder");
         RawMaterial darkStone = new RawMaterial("darkStone", "Heavy dark stone",
-                hedgehogAlp, 205, "sandpaper", "stoneDust");
+                hedgehogAlp, 205, "stoneDust");
 
         RawMaterial saltStone = new RawMaterial("saltStone", "Crystalline salt deposit",
-                wildWills, 206, "pickaxe", "saltCrystal");
+                wildWills, 206, "saltCrystal");
         RawMaterial shinyNut = new RawMaterial("shinyNut", "Hard nut with shiny shell",
-                hazelwood, 207, "pickaxe", "nutShell");
+                hazelwood, 207, "nutShell");
         RawMaterial foxberry = new RawMaterial("foxberry", "Cluster of tiny red berries",
-                foxwood, 208, "hands", "foxberryJuice");
-
-//        Recipe morningBloomElixir = new Recipe("morningBloomElixir", "Potion that grants stealth and night vision", sunfield, 1, 3, 0,
-//                List.of("fernTips", "lavender", "sweetGrass"));
-//        Recipe wardensBrew = new Recipe("wardensBrew", "Potion that restores stamina and inner warmth", sunfield, 2, 3, 0,
-//                List.of("ashRootSpice", "thornPowder", "stoneDust"));
-//        Recipe silverRainTonic = new Recipe("silverRainTonic", "Potion that grants cold resistance and calm focus", sunfield, 3, 3, 0,
-//                List.of("saltCrystal", "nutShell", "foxberryJuice"));
-//
-//
-//        sunfield.addItem(morningBloomElixir);
-//        sunfield.addItem(wardensBrew);
-//        sunfield.addItem(silverRainTonic);
-//
-//        Tool shovel = new Shovel("shovel", "To dig something", sunfield, 3,
-//                List.of("ashRootSpice"));
-//        Tool knife = new Knife("knife", "Sharp", sunfield, 3,
-//                List.of("lavender"));
-//        Tool pickaxe = new Pickaxe("pickaxe", "To mine something", sunfield, 3,
-//                List.of("saltCrystal", "nutShell"));
-//        Tool secateurs = new Secateurs("secateurs", "To cut something", sunfield, 3,
-//                List.of("fernTips", "sweetGrass"));
-//        Tool sandpaper = new Sandpaper("sandpaper", "To dig something", sunfield, 3,
-//                List.of("thornPowder","stoneDust"));
-//
-
+                foxwood, 208, "foxberryJuice");
 
         pub.addItem(beer);
         sunfield.addItem(grapes);
@@ -207,30 +180,25 @@ public class ZorkULGame {
 
     private void printWelcome() {
         System.out.println();
-        System.out.println("Welcome to the University adventure!");
+        System.out.println("Welcome to the mysterious Hecate adventure!");
         System.out.println("Type 'help' if you need help.");
         System.out.println();
         System.out.println(player.getCurrentRoom().getLongDescription());
     }
 
-    // Public method to print current room (for GUI)
     public void printCurrentRoom() {
         System.out.println(player.getCurrentRoom().getLongDescription());
     }
 
-    // Get current room name for GUI background
     public String getCurrentRoomName() {
         String description = player.getCurrentRoom().getDescription();
-        // Extract room name from "in the [roomname]"
         return description.replace("in the ", "").trim();
     }
 
-    // Get player for GUI
     public Character getPlayer() {
         return player;
     }
 
-    // Changed from private to public for GUI integration
     public boolean processCommand(Command command) {
         CommandType commandType = command.getCommandType();
 
@@ -278,12 +246,15 @@ public class ZorkULGame {
             case TALK:
                 player.talkToNPC(command);
                 break;
+            case ACHIEVEMENTS:
+                System.out.println(player.showAchievements());
+                break;
             case QUIT:
                 if (command.hasSecondWord()) {
                     System.out.println("Quit what?");
                     return false;
                 } else {
-                    return true; // signal to quit
+                    return true;
                 }
             default:
                 System.out.println("I don't know what you mean...");
@@ -384,8 +355,7 @@ public class ZorkULGame {
                 command.getSecondWord() + ".sav" : "savegame.sav";
 
         try {
-            Character loadedPlayer = GameSaver.loadGame(filename);
-            player = loadedPlayer;
+            player = GameSaver.loadGame(filename);
             System.out.println(player.getCurrentRoom().getLongDescription());
         } catch (GameLoadException e) {
             System.err.println("Load failed: " + e.getMessage());
@@ -413,6 +383,7 @@ public class ZorkULGame {
             player.setCurrentRoom(nextRoom);
             System.out.println(player.getCurrentRoom().getLongDescription());
             System.out.println("\nYour score is "+ player.getCoins());
+            player.checkExplorerAchievement(12); // 12 total rooms
         }
     }
 }

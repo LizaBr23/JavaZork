@@ -27,6 +27,10 @@ public class GameMap implements Serializable {
         return visitedRooms.contains(room);
     }
 
+    public int getVisitedRoomsCount() {
+        return visitedRooms.size();
+    }
+
     public void showMap(Room currentRoom) {
         if (visitedRooms.isEmpty()) {
             System.out.println("You haven't go anywhere, use go command to move.");

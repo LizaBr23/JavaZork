@@ -54,10 +54,6 @@ public class NPC implements GameEntity, Locatable, Serializable {
         inventory.put(itemName, price);
     }
 
-    public boolean hasItem(String itemName) {
-        return inventory.containsKey(itemName);
-    }
-
     public int getItemPrice(String itemName) {
         return inventory.getOrDefault(itemName, -1);
     }
@@ -68,14 +64,6 @@ public class NPC implements GameEntity, Locatable, Serializable {
 
     public void removeFromInventory(String itemName) {
         inventory.remove(itemName);
-    }
-
-    public void setTalking(boolean talking) {
-        this.isTalking = talking;
-    }
-
-    public boolean isTalking() {
-        return isTalking;
     }
 
     public List<String> getDialogueOptions(boolean hasObject) {

@@ -8,13 +8,11 @@ public class Parser {
     private final CommandWords commands;
     private Scanner scanner;
 
-    // Constructor for console mode
     public Parser() {
         commands = new CommandWords();
         scanner = new Scanner(System.in);
     }
 
-    // Constructor for GUI mode (no Scanner needed)
     public Parser(boolean guiMode) {
         commands = new CommandWords();
         if (!guiMode) {
@@ -27,38 +25,10 @@ public class Parser {
             throw new IllegalStateException("Parser was created in GUI mode - use parseCommandString() instead");
         }
 
-        String inputLine;
-        String commandWord = null;
-        String[] remainingWords = null;
-
         System.out.print("> ");
-        inputLine = scanner.nextLine();
+        String inputLine = scanner.nextLine();
 
-        if (inputLine == null || inputLine.isBlank()) {
-            return new Command(null, (String[]) null);
-        }
-
-        inputLine = inputLine.replaceAll("[^a-zA-Z0-9\\s\"']", "");
-
-        String[] words = split(inputLine);
-
-        if (words.length == 0 || (words.length == 1 && words[0].isEmpty())) {
-            return new Command(null, (String[]) null);
-        }
-
-        if (words.length > 0) {
-            commandWord = words[0];
-            if (!commands.isCommand(commandWord)) {
-                commandWord = null;
-            }
-            if (words.length > 1) {
-                remainingWords = new String[words.length - 1];
-                //copy from indx 1 words into remW [length]
-                System.arraycopy(words, 1, remainingWords, 0, words.length - 1);
-            }
-        }
-
-        return new Command(commandWord, remainingWords);
+        return parseCommandString(inputLine);
     }
 
 
@@ -96,13 +66,9 @@ public class Parser {
         commands.showAll();
     }
 
-    // New method to parse a command from a string (for GUI usage)
     public Command parseCommandString(String inputLine) {
-        String commandWord = null;
-        String[] remainingWords = null;
-
         if (inputLine == null || inputLine.isBlank()) {
-            return new Command(null, (String[]) null);
+            return new Command(null, null);
         }
 
         inputLine = inputLine.replaceAll("[^a-zA-Z0-9\\s\"']", "");
@@ -110,18 +76,19 @@ public class Parser {
         String[] words = split(inputLine);
 
         if (words.length == 0 || (words.length == 1 && words[0].isEmpty())) {
-            return new Command(null, (String[]) null);
+            return new Command(null, null);
         }
 
-        if (words.length > 0) {
-            commandWord = words[0];
-            if (!commands.isCommand(commandWord)) {
-                commandWord = null;
-            }
-            if (words.length > 1) {
-                remainingWords = new String[words.length - 1];
-                System.arraycopy(words, 1, remainingWords, 0, words.length - 1);
-            }
+        String commandWord = words[0];
+        String[] remainingWords = null;
+
+        if (commands.isCommand(commandWord)) {
+            commandWord = null;
+        }
+
+        if (words.length > 1) {
+            remainingWords = new String[words.length - 1];
+            System.arraycopy(words, 1, remainingWords, 0, words.length - 1);
         }
 
         return new Command(commandWord, remainingWords);

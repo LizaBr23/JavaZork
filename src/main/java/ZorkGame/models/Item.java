@@ -1,20 +1,20 @@
 package ZorkGame.models;
 
+import java.io.Serial;
 import java.io.Serializable;
-import ZorkGame.enums.ItemCategory;
-
 public abstract class Item implements GameEntity, Locatable, Describable, Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     private String description;
     private String name;
     private Room location;
-    private int id;
+    private final int ID;
 
     public Item(String name, String description, Room location, int id) {
         this.name = name;
         this.description = description;
         this.location = location;
-        this.id = id;
+        this.ID = id;
     }
 
     @Override
@@ -51,10 +51,6 @@ public abstract class Item implements GameEntity, Locatable, Describable, Serial
     }
 
     public int getId() {
-        return id;
+        return ID;
     }
-
-    public abstract ItemCategory getCategory();
-    public abstract boolean canBeTaken();
-    public abstract void onPickup(Character player);
 }

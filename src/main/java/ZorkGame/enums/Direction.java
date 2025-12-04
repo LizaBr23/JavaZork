@@ -7,14 +7,14 @@ public enum Direction {
     EAST("east"),
     WEST("west");
 
-    private final String directionName;
+    private final String DIRECTION_NAME;
 
     Direction(String directionName) {
-        this.directionName = directionName;
+        this.DIRECTION_NAME = directionName;
     }
 
     public String getDirectionName() {
-        return directionName;
+        return DIRECTION_NAME;
     }
 
     // Convert string to Direction enum
@@ -24,7 +24,7 @@ public enum Direction {
         }
 
         for (Direction direction : Direction.values()) {
-            if (direction.directionName.equalsIgnoreCase(text)) {
+            if (direction.DIRECTION_NAME.equalsIgnoreCase(text)) {
                 return direction;
             }
         }
@@ -38,12 +38,4 @@ public enum Direction {
         };
     }
 
-  public Direction getOpposite() {
-        return switch (this) {
-            case NORTH -> SOUTH;
-            case SOUTH -> NORTH;
-            case EAST -> WEST;
-            case WEST -> EAST;
-        };
-    }
 }

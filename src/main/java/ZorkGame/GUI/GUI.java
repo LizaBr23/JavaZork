@@ -2,9 +2,12 @@ package ZorkGame.GUI;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
@@ -37,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 public class GUI extends Application {
@@ -76,6 +81,12 @@ public class GUI extends Application {
     private NPC currentNPC;
     private boolean inShop;
     private HBox dialogueButtons;
+
+    // Coin display
+    private Label coinLabel;
+
+    // HP display
+    private Label hpLabel;
 
     @Override
     public void start(Stage primaryStage) {
@@ -152,9 +163,7 @@ public class GUI extends Application {
         actionResultPane.setVisible(false);
         actionResultPane.setManaged(false);
 
-        actionResultPane.viewportBoundsProperty().addListener((obs, oldVal, newVal) -> {
-            actionResultArea.setPrefHeight(newVal.getHeight());
-        });
+        actionResultPane.viewportBoundsProperty().addListener((obs, oldVal, newVal) -> actionResultArea.setPrefHeight(newVal.getHeight()));
     }
 
     private void setupInputField() {
@@ -188,11 +197,49 @@ public class GUI extends Application {
         topButtons.setAlignment(Pos.CENTER_LEFT);
         topButtons.setPadding(new Insets(10));
         topButtons.getChildren().addAll(
-            createTextButton("Quit", e -> Platform.exit()),
+            createTextButton(e -> Platform.exit()),
             createTextButton("Save", "save"),
             createTextButton("Load", "load")
         );
-        root.setTop(topButtons);
+
+        // Coin display
+        coinLabel = new Label("Coins: 0");
+        coinLabel.setStyle(
+            "-fx-text-fill: gold; " +
+            "-fx-font-size: 18px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-background-color: " + DARK_BG + "; " +
+            "-fx-border-color: gold; " +
+            "-fx-border-width: 2px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-background-radius: 5px;"
+        );
+
+        // HP display
+        hpLabel = new Label("HP: 20");
+        hpLabel.setStyle(
+            "-fx-text-fill: #ff6666; " +
+            "-fx-font-size: 18px; " +
+            "-fx-font-weight: bold; " +
+            "-fx-padding: 10px 20px; " +
+            "-fx-background-color: " + DARK_BG + "; " +
+            "-fx-border-color: #ff6666; " +
+            "-fx-border-width: 2px; " +
+            "-fx-border-radius: 5px; " +
+            "-fx-background-radius: 5px;"
+        );
+
+        // Container for top bar with buttons on left and coins/HP on right
+        HBox topBar = new HBox();
+        topBar.setAlignment(Pos.CENTER_LEFT);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        HBox rightStats = new HBox(10);
+        rightStats.getChildren().addAll(hpLabel, coinLabel);
+        topBar.getChildren().addAll(topButtons, spacer, rightStats);
+
+        root.setTop(topBar);
 
         // Right side buttons
         VBox rightButtons = new VBox(15);
@@ -214,10 +261,10 @@ public class GUI extends Application {
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
-        grid.add(createImageButton("north.png", "go north", 50, "Move north"), 1, 0);
-        grid.add(createImageButton("west.png", "go west", 50, "Move west"), 0, 1);
-        grid.add(createImageButton("east.png", "go east", 50, "Move east"), 2, 1);
-        grid.add(createImageButton("south.png", "go south", 50, "Move south"), 1, 2);
+        grid.add(createImageButton("north.png", "go north", "Move north"), 1, 0);
+        grid.add(createImageButton("west.png", "go west", "Move west"), 0, 1);
+        grid.add(createImageButton("east.png", "go east", "Move east"), 2, 1);
+        grid.add(createImageButton("south.png", "go south", "Move south"), 1, 2);
         return grid;
     }
 
@@ -235,9 +282,7 @@ public class GUI extends Application {
         );
         scrollPane.setPadding(new Insets(5));
         scrollPane.setOpacity(1.0);
-        scrollPane.viewportBoundsProperty().addListener((obs, oldVal, newVal) -> {
-            textArea.setPrefHeight(newVal.getHeight());
-        });
+        scrollPane.viewportBoundsProperty().addListener((obs, oldVal, newVal) -> textArea.setPrefHeight(newVal.getHeight()));
 
         // Dialogue buttons
         dialogueButtons = new HBox(10);
@@ -310,7 +355,7 @@ public class GUI extends Application {
             }
 
             @Override
-            public void write(byte[] b, int off, int len) {
+            public void write(@NotNull byte[] b, int off, int len) {
                 synchronized (buffer) {
                     buffer.append(new String(b, off, len));
                     if (buffer.indexOf("\n") >= 0) {
@@ -322,7 +367,7 @@ public class GUI extends Application {
             @Override
             public void flush() {
                 synchronized (buffer) {
-                    if (buffer.length() > 0) {
+                    if (!buffer.isEmpty()) {
                         String text = buffer.toString();
                         buffer.setLength(0);
                         Platform.runLater(() -> textArea.appendText(text));
@@ -345,11 +390,13 @@ public class GUI extends Application {
         System.out.println("Type 'help' if you need help.");
         System.out.println();
         game.printCurrentRoom();
+        updateCoinDisplay();
+        updateHPDisplay();
     }
 
     private void startBackgroundMusic() {
         try {
-            String musicPath = getClass().getResource("/mp3/music.mp3").toExternalForm();
+            String musicPath = Objects.requireNonNull(getClass().getResource("/mp3/music.mp3")).toExternalForm();
             Media sound = new Media(musicPath);
             MediaPlayer player = new MediaPlayer(sound);
             player.setCycleCount(MediaPlayer.INDEFINITE);
@@ -370,36 +417,28 @@ public class GUI extends Application {
         return button;
     }
 
-    private Button createTextButton(String text, javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
-        Button button = new Button(text);
+    private Button createTextButton(EventHandler<ActionEvent> handler) {
+        Button button = new Button("Quit");
         button.setStyle(TEXT_BUTTON_STYLE);
         button.setOnAction(handler);
         return button;
     }
 
-    private Button createImageButton(String imageName, String command) {
-        return createImageButton(imageName, command, 40, null);
-    }
-
     private Button createImageButton(String imageName, String command, String tooltipText) {
-        return createImageButton(imageName, command, 40, tooltipText);
-    }
-
-    private Button createImageButton(String imageName, String command, int size) {
-        return createImageButton(imageName, command, size, null);
-    }
-
-    private Button createImageButton(String imageName, String command, int size, String tooltipText) {
         Button button = new Button();
         button.setStyle(IMAGE_BUTTON_STYLE);
 
-        Image image = new Image(getClass().getResourceAsStream("/ZorkGame/images/" + imageName));
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/ZorkGame/images/" + imageName)));
         ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(size);
-        imageView.setFitHeight(size);
+        imageView.setFitWidth(50);
+        imageView.setFitHeight(50);
         button.setGraphic(imageView);
 
         button.setOnAction(e -> {
+            // Track if it's a direction button
+            if (command.startsWith("go ")) {
+                game.getPlayer().trackDirectionButtonUsed();
+            }
             textArea.appendText("> " + command + "\n");
             processCommand(command);
         });
@@ -417,15 +456,13 @@ public class GUI extends Application {
         Button button = new Button();
         button.setStyle(IMAGE_BUTTON_STYLE);
 
-        Image image = new Image(getClass().getResourceAsStream("/ZorkGame/images/" + imageName));
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/ZorkGame/images/" + imageName)));
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(40);
         imageView.setFitHeight(40);
         button.setGraphic(imageView);
 
-        button.setOnAction(e -> {
-            showActionResult(command);
-        });
+        button.setOnAction(e -> showActionResult(command));
 
         // Add tooltip
         if (tooltipText != null && !tooltipText.isEmpty()) {
@@ -457,7 +494,23 @@ public class GUI extends Application {
         }
 
         updateBackground(game.getCurrentRoomName());
+        updateCoinDisplay();
+        updateHPDisplay();
         checkForDialogue();
+    }
+
+    private void updateCoinDisplay() {
+        if (game != null && game.getPlayer() != null) {
+            int coins = game.getPlayer().getCoins();
+            Platform.runLater(() -> coinLabel.setText("Coins: " + coins));
+        }
+    }
+
+    private void updateHPDisplay() {
+        if (game != null && game.getPlayer() != null) {
+            int hp = game.getPlayer().getHp();
+            Platform.runLater(() -> hpLabel.setText("HP: " + hp));
+        }
     }
 
     private void checkForDialogue() {
@@ -489,7 +542,7 @@ public class GUI extends Application {
     private void updateBackground(String roomName) {
         String imageName = roomName.replace(" ", "").toLowerCase();
         try {
-            Image image = new Image(getClass().getResourceAsStream("/ZorkGame/images/" + imageName + ".png"));
+            Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/ZorkGame/images/" + imageName + ".png")));
             BackgroundImage bgImage = new BackgroundImage(
                 image,
                 BackgroundRepeat.NO_REPEAT,
@@ -651,6 +704,8 @@ public class GUI extends Application {
         try {
             game.getPlayer().buyToolFromNPC(currentNPC, itemName);
             textArea.appendText("\nYou try to buy: " + itemName + "!\n\n");
+            updateCoinDisplay();
+            updateHPDisplay();
             enterShop();
         } catch (Exception e) {
             textArea.appendText("\nCouldn't purchase item.\n\n");
@@ -704,7 +759,7 @@ public class GUI extends Application {
             }
 
             @Override
-            public void write(byte[] b, int off, int len) {
+            public void write(@NotNull byte[] b, int off, int len) {
                 synchronized (buffer) {
                     buffer.append(new String(b, off, len));
                     if (buffer.indexOf("\n") >= 0) {
@@ -716,7 +771,7 @@ public class GUI extends Application {
             @Override
             public void flush() {
                 synchronized (buffer) {
-                    if (buffer.length() > 0) {
+                    if (!buffer.isEmpty()) {
                         String text = buffer.toString();
                         buffer.setLength(0);
                         Platform.runLater(() -> actionResultArea.appendText(text));
@@ -734,6 +789,10 @@ public class GUI extends Application {
 
         // Restore main output
         System.setOut(mainOutputStream);
+
+        // Update coin display
+        updateCoinDisplay();
+        updateHPDisplay();
 
         // Show the panel
         actionResultPane.setVisible(true);

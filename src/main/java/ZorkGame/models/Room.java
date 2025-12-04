@@ -9,36 +9,36 @@ import ZorkGame.enums.AreaStorytelling;
 import ZorkGame.utils.GenericClass;
 
 public class Room implements Describable, Serializable {
-    private String description;
-    private Map<Direction, Room> exits;
-    private GenericClass<Item> items = new GenericClass<>();
-    private GenericClass<NPC> npcs = new GenericClass<>();
+    private final String DESCRIPTION;
+    private final Map<Direction, Room> EXITS;
+    private final GenericClass<Item> ITEMS = new GenericClass<>();
+    private final GenericClass<NPC> NPCS = new GenericClass<>();
 
 
 
     public Room(String description) {
-        this.description = description;
-        exits = new HashMap<>();
+        this.DESCRIPTION = description;
+        EXITS = new HashMap<>();
     }
 
     public void addItem(Item item){
-        items.add(item);
+        ITEMS.add(item);
     }
 
     public void removeItem(Item item){
-        items.remove(item);
+        ITEMS.remove(item);
     }
 
     public void addNPC(NPC npc){
-        npcs.add(npc);
+        NPCS.add(npc);
     }
 
     public List<Item> getItems() {
-        return items.getAll();
+        return ITEMS.getAll();
     }
 
     public List<NPC> getNPCs() {
-        return npcs.getAll();
+        return NPCS.getAll();
     }
 
     @Override
@@ -48,7 +48,7 @@ public class Room implements Describable, Serializable {
         StringBuilder storytelling = new StringBuilder();
 
         try {
-            String cleanedDescription = description.toLowerCase();
+            String cleanedDescription = DESCRIPTION.toLowerCase();
             if (cleanedDescription.startsWith("in the ")) {
                 cleanedDescription = cleanedDescription.substring(7);
             } else if (cleanedDescription.startsWith("in ")) {
@@ -57,48 +57,42 @@ public class Room implements Describable, Serializable {
 
             String roomNameUpper = cleanedDescription.toUpperCase().replace(" ", "");
             AreaStorytelling story = AreaStorytelling.valueOf(roomNameUpper);
-            if (story != null) {
-                storytelling.append("\n").append(story.getDescription()).append("\n");
-            }
+            storytelling.append("\n").append(story.getDescription()).append("\n");
         } catch (IllegalArgumentException e) {
             //no story
         }
 
-        if(!items.isEmpty()){
+        if(!ITEMS.isEmpty()){
             itemList.append("\nYou see: \n");
-            for (Item i : items.getAll()){
+            for (Item i : ITEMS.getAll()){
                 itemList.append(i.getName()).append(" - ").append(i.getDescription()).append(" \n");
             }
         }
-        if(!npcs.isEmpty()){
+        if(!NPCS.isEmpty()){
             npcList.append("You see: \n");
-            for (NPC n : npcs.getAll()){
+            for (NPC n : NPCS.getAll()){
                 npcList.append("  - ").append(n.getName()).append("\n");            }
         }
-        return "You are " + description + ".\nExits: " + getExitString() + storytelling.toString() + itemList.toString() + "\n" + npcList.toString();
+        return "You are " + DESCRIPTION + ".\nExits: " + getExitString() + storytelling + itemList + "\n" + npcList;
     }
 
     @Override
     public String getDescription() {
-        return description;
+        return DESCRIPTION;
     }
 
     public void setExit(Direction direction, Room neighbor) {
-        exits.put(direction, neighbor);
-    }
-
-    public Room getExit(Direction direction) {
-        return exits.get(direction);
+        EXITS.put(direction, neighbor);
     }
 
     public Room getExit(String directionStr) {
         Direction direction = Direction.fromString(directionStr);
-        return direction != null ? exits.get(direction) : null;
+        return direction != null ? EXITS.get(direction) : null;
     }
 
     public String getExitString() {
         StringBuilder sb = new StringBuilder();
-        for (Direction direction : exits.keySet()) {
+        for (Direction direction : EXITS.keySet()) {
             sb.append(direction.getDirectionName()).append(" ");
         }
         return sb.toString().trim();

@@ -4,11 +4,13 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import ZorkGame.commands.Command;
+import ZorkGame.enums.AchievementType;
 import ZorkGame.enums.RecipeType;
 import ZorkGame.enums.ToolType;
 import ZorkGame.exceptions.InvalidDialogueInputException;
@@ -24,34 +26,48 @@ public class Character implements GameEntity, Locatable, Serializable {
 
     private static boolean guiMode = false;
 
-    private final String name;
+    private final String NAME;
     private Room currentRoom;
-    private GenericClass<Item> inventory = new GenericClass<>();
-    private GameMap map;
+    private final GenericClass<Item> INVENTORY = new GenericClass<>();
+    private final GameMap MAP;
     private int coins;
     private int hp;
+
+    // Achievement tracking
+    private final Set<AchievementType> UNLOCKED_ACHIEVEMENTS;
+    private final Set<String> NPCS_TALKED_TO;
+    private final Set<String> TOOLS_BOUGHT;
+    private boolean hasOpenedMap = false;
+    private boolean hasOpenedInventory = false;
+    private boolean hasPickedItem = false;
+    private boolean hasDroppedItem = false;
+    private boolean hasUsedDirectionButton = false;
 
     public static void setGuiMode(boolean mode) {
         guiMode = mode;
     }
 
     public Character(String name, Room startingRoom) {
-        this.name = name;
+        this.NAME = name;
         this.currentRoom = startingRoom;
-        this.map = new GameMap();
-        this.map.visitRoom(startingRoom);
+        this.MAP = new GameMap();
+        this.MAP.visitRoom(startingRoom);
         this.coins = 0;
+        this.hp = 20;
+        this.UNLOCKED_ACHIEVEMENTS = new HashSet<>();
+        this.NPCS_TALKED_TO = new HashSet<>();
+        this.TOOLS_BOUGHT = new HashSet<>();
     }
 
 
     @Override
     public String getName() {
-        return name;
+        return NAME;
     }
 
     @Override
     public String getDescription() {
-        return "Character: " + name;
+        return "Character: " + NAME;
     }
 
     @Override
@@ -70,18 +86,26 @@ public class Character implements GameEntity, Locatable, Serializable {
 
     public void setCurrentRoom(Room room) {
         this.currentRoom = room;
-        if(!map.isVisited(room)) {
+        if(!MAP.isVisited(room)) {
             coins++;
         }
-        this.map.visitRoom(room);
+        this.MAP.visitRoom(room);
     }
 
     public int getCoins() {
         return coins;
     }
 
-    private void decrementCoins() {
-        this.coins--;
+    public int getHp(){
+            return hp;
+    }
+
+    private void looseHp(int hp){
+        this.hp -= hp;
+    }
+
+    private void GainHp(int hp){
+        this.hp += hp;
     }
 
     private void spendCoins(int amount) {
@@ -89,7 +113,8 @@ public class Character implements GameEntity, Locatable, Serializable {
     }
 
     public void showMap() {
-        map.showMap(currentRoom);
+        trackMapOpened();
+        MAP.showMap(currentRoom);
     }
 
     public void talkToNPC(Command command) {
@@ -107,6 +132,8 @@ public class Character implements GameEntity, Locatable, Serializable {
             System.out.println("There's no one named " + npcName + " here.");
             return;
         }
+
+        trackNPCTalk(npcName);
 
         if (guiMode) {
             System.out.println("DIALOGUE_START:" + npcName);
@@ -271,18 +298,20 @@ public class Character implements GameEntity, Locatable, Serializable {
         //try to create a tool first
         Tool tool = createToolByName(toolName);
         if (tool != null) {
-            inventory.add(tool);
+            INVENTORY.add(tool);
             npc.removeFromInventory(toolName);
             spendCoins(price);
+            trackToolBought(toolName);
             System.out.println("You obtained: " + toolName + " from " + npc.getName() + " for " + price + " coins.\n");
             System.out.println("Coins remaining: " + coins + "\n");
         } else {
             //if not a tool, try to create an item
             Item item = createRecipeByName(toolName);
             if (item != null) {
-                inventory.add(item);
+                INVENTORY.add(item);
                 npc.removeFromInventory(toolName);
                 spendCoins(price);
+                checkRecipeCollectorAchievement();
                 System.out.println("You obtained: " + toolName + " from " + npc.getName() + " for " + price + " coins.\n");
                 System.out.println("Coins remaining: " + coins + "\n");
             } else {
@@ -310,7 +339,7 @@ public class Character implements GameEntity, Locatable, Serializable {
 
     //check for a specific item
     public boolean hasItem(String itemName) {
-        for (Item item : inventory.getAll()) {
+        for (Item item : INVENTORY.getAll()) {
             if (item.getName().equalsIgnoreCase(itemName)) {
                 return true;
             }
@@ -320,7 +349,7 @@ public class Character implements GameEntity, Locatable, Serializable {
 
 
     public void useTool(String toolName, String rawMaterialName) {
-        Tool tool = inventory.findByTypeAndName(Tool.class, toolName);
+        Tool tool = INVENTORY.findByTypeAndName(Tool.class, toolName);
 
         if (tool == null) {
             System.out.println("You don't have a " + toolName + ".");
@@ -357,6 +386,8 @@ public class Character implements GameEntity, Locatable, Serializable {
 
         System.out.println("You used " + toolName + " on " + rawMaterialName +
                 " and dropped " + ingredientName + "!");
+
+        checkAlchemistAchievement();
     }
 
     public void squeezeItem(String itemName) {
@@ -391,7 +422,7 @@ public class Character implements GameEntity, Locatable, Serializable {
             return;
         }
 
-        Item itemToDrop = inventory.findByName(itemName);
+        Item itemToDrop = INVENTORY.findByName(itemName);
 
         if (itemToDrop != null) {
 
@@ -401,14 +432,15 @@ public class Character implements GameEntity, Locatable, Serializable {
             }
 
             if (itemToDrop instanceof Ingredient ingredient) {
-                List<Recipe> recipes = inventory.findAllByType(Recipe.class);
+                List<Recipe> recipes = INVENTORY.findAllByType(Recipe.class);
                 for (Recipe recipe : recipes) {
                     recipe.removeIngredient(ingredient.getName());
                 }
             }
 
-            inventory.remove(itemToDrop);
+            INVENTORY.remove(itemToDrop);
             currentRoom.addItem(itemToDrop);
+            trackItemDropped();
             System.out.println("You dropped the " + itemToDrop.getName() + ".");
         } else {
             System.out.println("You don't have that item.");
@@ -420,15 +452,16 @@ public class Character implements GameEntity, Locatable, Serializable {
         Item foundItem = roomItems.findByPartialName(itemName);
 
         if(foundItem != null){
-            inventory.add(foundItem);
+            INVENTORY.add(foundItem);
             currentRoom.removeItem(foundItem);
+            trackItemPicked();
 
             boolean completedRecipe = false;
             String completedRecipeName = "";
 
             if (foundItem instanceof Recipe newRecipe) {
 
-                List<Ingredient> ingredients = inventory.findAllByType(Ingredient.class);
+                List<Ingredient> ingredients = INVENTORY.findAllByType(Ingredient.class);
                 for (Ingredient ingredient : ingredients) {
                     newRecipe.addIngredient(ingredient.getName());
                 }
@@ -445,9 +478,11 @@ public class Character implements GameEntity, Locatable, Serializable {
                     System.out.println("You've completed the recipe for " + completedRecipeName + "!");
                 }
 
+                checkRecipeCollectorAchievement();
+
             } else if (foundItem instanceof Ingredient ingredient) {
 
-                List<Recipe> recipes = inventory.findAllByType(Recipe.class);
+                List<Recipe> recipes = INVENTORY.findAllByType(Recipe.class);
                 for (Recipe recipe : recipes) {
                     if (recipe.addIngredient(ingredient.getName())) {
                         if(recipe.getCollected() >= recipe.getIngredients()) {
@@ -462,12 +497,14 @@ public class Character implements GameEntity, Locatable, Serializable {
                 if(completedRecipe){
                     System.out.println("You've completed the recipe for " + completedRecipeName + "!");
                 }
+
+                checkAlchemistAchievement();
             } else {
                 // Regular item
                 System.out.println("\nYou picked up " + foundItem.getName() + ".\n");
             }
 
-            List<Recipe> allRecipes = inventory.findAllByType(Recipe.class);
+            List<Recipe> allRecipes = INVENTORY.findAllByType(Recipe.class);
             boolean allRecipesComplete = true;
             int recipeCount = allRecipes.size();
 
@@ -477,6 +514,8 @@ public class Character implements GameEntity, Locatable, Serializable {
                     break;
                 }
             }
+
+            checkMasterChefAchievement();
 
             if(recipeCount > 0 && recipeCount >= Recipe.getNumRecipes() && allRecipesComplete) {
                 System.out.println("\n*** Congratulations! You've completed all recipes! ***");
@@ -490,13 +529,15 @@ public class Character implements GameEntity, Locatable, Serializable {
     }
 
     public String listInventory(){
-        if(inventory.isEmpty()){
+        trackInventoryOpened();
+
+        if(INVENTORY.isEmpty()){
             return "\nYou have no items with you.";
         }
         else{
             //count items
             Map<String, Integer> itemCounts = new HashMap<>();
-            for(Item item : inventory.getAll()){
+            for(Item item : INVENTORY.getAll()){
                 String itemName = item.getName();
                 itemCounts.put(itemName, itemCounts.getOrDefault(itemName, 0) + 1);
             }
@@ -507,9 +548,9 @@ public class Character implements GameEntity, Locatable, Serializable {
                 int count = entry.getValue();
 
                 if(count > 1){
-                    print.append(itemName + " x" + count + " ");
+                    print.append(itemName).append(" x").append(count).append(" ");
                 } else {
-                    print.append(itemName + " ");
+                    print.append(itemName).append(" ");
                 }
             }
             return "\nYour inventory: " + print.toString();
@@ -517,7 +558,7 @@ public class Character implements GameEntity, Locatable, Serializable {
     }
 
     public void checkRecipes() {
-        List<Recipe> recipes = inventory.findAllByType(Recipe.class);
+        List<Recipe> recipes = INVENTORY.findAllByType(Recipe.class);
         System.out.println("\n=== Recipe Progress ===");
 
         for (Recipe recipe : recipes) {
@@ -539,6 +580,154 @@ public class Character implements GameEntity, Locatable, Serializable {
 
     public void checkRecipesParallel() {
         checkRecipes();
+    }
+
+    public void unlockAchievement(AchievementType achievement) {
+        if (UNLOCKED_ACHIEVEMENTS.add(achievement)) {
+            System.out.println("\n*** Achievement Unlocked: " + achievement.getName() + " ***");
+            System.out.println(achievement.getDescription() + "\n");
+        }
+    }
+
+    public Set<AchievementType> getUnlockedAchievements() {
+        return new HashSet<>(UNLOCKED_ACHIEVEMENTS);
+    }
+
+    public Set<AchievementType> getLockedAchievements() {
+        Set<AchievementType> locked = new HashSet<>();
+        for (AchievementType achievement : AchievementType.values()) {
+            if (!UNLOCKED_ACHIEVEMENTS.contains(achievement)) {
+                locked.add(achievement);
+            }
+        }
+        return locked;
+    }
+
+    public void trackNPCTalk(String npcName) {
+        NPCS_TALKED_TO.add(npcName);
+        checkSocialiteAchievement();
+    }
+
+    public void trackToolBought(String toolName) {
+        TOOLS_BOUGHT.add(toolName);
+        checkToolCollectorAchievement();
+    }
+
+    public void trackMapOpened() {
+        if (!hasOpenedMap) {
+            hasOpenedMap = true;
+            unlockAchievement(AchievementType.CARTOGRAPHER);
+        }
+    }
+
+    public void trackInventoryOpened() {
+        if (!hasOpenedInventory) {
+            hasOpenedInventory = true;
+            unlockAchievement(AchievementType.HOARDER);
+        }
+    }
+
+    public void trackItemPicked() {
+        if (!hasPickedItem) {
+            hasPickedItem = true;
+            unlockAchievement(AchievementType.GATHERER);
+        }
+    }
+
+    public void trackItemDropped() {
+        if (!hasDroppedItem) {
+            hasDroppedItem = true;
+            unlockAchievement(AchievementType.MINIMALIST);
+        }
+    }
+
+    public void trackDirectionButtonUsed() {
+        if (!hasUsedDirectionButton) {
+            hasUsedDirectionButton = true;
+            unlockAchievement(AchievementType.NAVIGATOR);
+        }
+    }
+
+    public void checkExplorerAchievement(int totalRooms) {
+        if (MAP.getVisitedRoomsCount() >= totalRooms) {
+            unlockAchievement(AchievementType.EXPLORER);
+        }
+    }
+
+    private void checkSocialiteAchievement() {
+        if (NPCS_TALKED_TO.size() >= 2) {
+            unlockAchievement(AchievementType.SOCIALITE);
+        }
+    }
+
+    private void checkToolCollectorAchievement() {
+        if (TOOLS_BOUGHT.size() >= 5) {
+            unlockAchievement(AchievementType.TOOL_COLLECTOR);
+        }
+    }
+
+    public void checkAlchemistAchievement() {
+        List<Ingredient> ingredients = INVENTORY.findAllByType(Ingredient.class);
+        if (ingredients.size() >= 9) {
+            unlockAchievement(AchievementType.ALCHEMIST);
+        }
+    }
+
+    public void checkRecipeCollectorAchievement() {
+        List<Recipe> recipes = INVENTORY.findAllByType(Recipe.class);
+        if (recipes.size() >= 3) {
+            unlockAchievement(AchievementType.RECIPE_COLLECTOR);
+        }
+    }
+
+    public void checkMasterChefAchievement() {
+        List<Recipe> recipes = INVENTORY.findAllByType(Recipe.class);
+        if (recipes.isEmpty()) {
+            return;
+        }
+
+        boolean allComplete = true;
+        for (Recipe recipe : recipes) {
+            if (recipe.getCollected() < recipe.getIngredients()) {
+                allComplete = false;
+                break;
+            }
+        }
+
+        if (allComplete && recipes.size() >= 3) {
+            unlockAchievement(AchievementType.MASTER_CHEF);
+        }
+    }
+
+    public GameMap getMap() {
+        return MAP;
+    }
+
+    public String showAchievements() {
+        StringBuilder output = new StringBuilder();
+        output.append("\n=== ACHIEVEMENTS ===\n\n");
+
+        Set<AchievementType> unlocked = getUnlockedAchievements();
+        Set<AchievementType> locked = getLockedAchievements();
+
+        if (!unlocked.isEmpty()) {
+            output.append("Unlocked:\n");
+            for (AchievementType achievement : unlocked) {
+                output.append("✓").append(achievement.getName()).append(": ").append(achievement.getDescription()).append("\n");
+            }
+            output.append("\n");
+        }
+
+        if (!locked.isEmpty()) {
+            output.append("Locked:\n");
+            for (AchievementType achievement : locked) {
+                output.append("x").append(achievement.getName()).append(": ").append(achievement.getDescription()).append("\n");
+            }
+        }
+
+        output.append("\nAchievements unlocked: ").append(unlocked.size()).append("/").append(AchievementType.values().length);
+
+        return output.toString();
     }
 }
 

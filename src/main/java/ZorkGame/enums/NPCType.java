@@ -35,39 +35,39 @@ public enum NPCType {
         "\n--- Alice's Story ---\nAlice whispers ancient words.\n\"The tools I have store mysterious ancient magic. Use them wisely, and they will serve you well.\"\nShe touches your shoulder gently.\n"
     );
 
-    private final String baseDescription;
-    private final String withObjectDescription;
-    private final List<String> firstOptions;
-    private final List<String> afterStoryOptions;
-    private final String storyText;
+    private final String BASE_DESCRIPTION;
+    private final String WITH_OBJECT_DESCRIPTION;
+    private final List<String> FIRST_OPTIONS;
+    private final List<String> AFTER_STORY_OPTIONS;
+    private final String STORY_TEXT;
 
     NPCType(String baseDescription, String withObjectDescription,
             List<String> firstOptions, List<String> afterStoryOptions,
             String storyText) {
-        this.baseDescription = baseDescription;
-        this.withObjectDescription = withObjectDescription;
-        this.firstOptions = firstOptions;
-        this.afterStoryOptions = afterStoryOptions;
-        this.storyText = storyText;
+        this.BASE_DESCRIPTION = baseDescription;
+        this.WITH_OBJECT_DESCRIPTION = withObjectDescription;
+        this.FIRST_OPTIONS = firstOptions;
+        this.AFTER_STORY_OPTIONS = afterStoryOptions;
+        this.STORY_TEXT = storyText;
     }
 
     public String getBaseDescription() {
-        return baseDescription;
+        return BASE_DESCRIPTION;
     }
 
     public String getWithObjectDescription() {
-        return withObjectDescription;
+        return WITH_OBJECT_DESCRIPTION;
     }
 
     public List<String> getFirstOptions() {
-        return firstOptions;
+        return FIRST_OPTIONS;
     }
 
     public List<String> getAfterStoryOptions() {
-        return afterStoryOptions;
+        return AFTER_STORY_OPTIONS;
     }
 
     public String getStoryText() {
-        return storyText;
+        return STORY_TEXT;
     }
 }

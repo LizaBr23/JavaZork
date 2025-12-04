@@ -10,47 +10,28 @@ public class GenericDialogHandler implements DialogueHandler {
     private static final long serialVersionUID = 20L;
 
     private boolean heardStory = false;
-    private String baseDescription;
-    private String withObjectDescription;
-    private List<String> firstOptions;
-    private List<String> afterStoryOptions;
-    private String storyText;
+    private final String BASE_DESCRIPTION;
+    private final String WITH_OBJECT_DESCRIPTION;
+    private final List<String> FIRST_OPTIONS;
+    private final List<String> AFTER_STORY_OPTIONS;
+    private final String STORY_TEXT;
 
     public GenericDialogHandler(NPCType npcType) {
-        this.baseDescription = npcType.getBaseDescription();
-        this.withObjectDescription = npcType.getWithObjectDescription();
-        this.firstOptions = npcType.getFirstOptions();
-        this.afterStoryOptions = npcType.getAfterStoryOptions();
-        this.storyText = npcType.getStoryText();
+        this.BASE_DESCRIPTION = npcType.getBaseDescription();
+        this.WITH_OBJECT_DESCRIPTION = npcType.getWithObjectDescription();
+        this.FIRST_OPTIONS = npcType.getFirstOptions();
+        this.AFTER_STORY_OPTIONS = npcType.getAfterStoryOptions();
+        this.STORY_TEXT = npcType.getStoryText();
     }
 
     // Create GenericDialogHandler from NPCType enum
     public static GenericDialogHandler fromNPCType(NPCType npcType) {
         return new GenericDialogHandler(npcType);
     }
-    public void setBaseDescription(String baseDescription) {
-        this.baseDescription = baseDescription;
-    }
-
-    public void setWithObjectDescription(String withObjectDescription) {
-        this.withObjectDescription = withObjectDescription;
-    }
-
-    public void setFirstOptions(List<String> firstOptions) {
-        this.firstOptions = firstOptions;
-    }
-
-    public void setAfterStoryOptions(List<String> afterStoryOptions) {
-        this.afterStoryOptions = afterStoryOptions;
-    }
-
-    public void setStoryText(String storyText) {
-        this.storyText = storyText;
-    }
 
     @Override
     public String getDescription(boolean hasObject) {
-        return hasObject ? withObjectDescription : baseDescription;
+        return hasObject ? WITH_OBJECT_DESCRIPTION : BASE_DESCRIPTION;
     }
 
     @Override
@@ -62,7 +43,7 @@ public class GenericDialogHandler implements DialogueHandler {
             );
         }
 
-        return heardStory ? afterStoryOptions : firstOptions;
+        return heardStory ? AFTER_STORY_OPTIONS : FIRST_OPTIONS;
     }
 
     @Override
@@ -77,7 +58,7 @@ public class GenericDialogHandler implements DialogueHandler {
         if (!heardStory) {
             if (choice == 1) {
                 heardStory = true;
-                return storyText;
+                return STORY_TEXT;
             }else if (choice == 2) {
                 return "\nThey smile slightly.\n\"I'm doing well, thank you.\"";
             } else if (choice == 3) {

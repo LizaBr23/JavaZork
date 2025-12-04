@@ -2,26 +2,20 @@ package ZorkGame.enums;
 
 // Enum for types of items in the game
 public enum ItemCategory {
-    TOOL("Tool", "Items used to gather or process materials"),
-    INGREDIENT("Ingredient", "Processed materials used in recipes"),
-    RAW_MATERIAL("Raw Material", "Unprocessed materials found in the world"),
-    POTION("Potion", "Consumable items with special effects"),
-    QUEST_ITEM("Quest Item", "Special items for quests or trading"),
-    RECIPE("Recipe", "Instructions for creating potions");
+    TOOL("Items used to gather or process materials"),
+    INGREDIENT("Processed materials used in recipes"),
+    RAW_MATERIAL("Unprocessed materials found in the world"),
+    POTION("Consumable items with special effects"),
+    QUEST_ITEM("Special items for quests or trading"),
+    RECIPE("Instructions for creating potions");
 
-    private final String displayName;
-    private final String description;
+    private final String DESCRIPTION;
 
-    ItemCategory(String displayName, String description) {
-        this.displayName = displayName;
-        this.description = description;
-    }
-
-    public String getDisplayName() {
-        return displayName;
+    ItemCategory(String description) {
+        this.DESCRIPTION = description;
     }
 
     public String getDescription() {
-        return description;
+        return DESCRIPTION;
     }
 }
