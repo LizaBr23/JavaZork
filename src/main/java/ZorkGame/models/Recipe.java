@@ -19,9 +19,8 @@ public class Recipe extends Item {
         super(name, description, location, id);
         this.ingredients = ingredients;
         this.collected = collected;
-        this.ingredient = ingredient;
+        this.ingredient = ingredient != null ? ingredient : new ArrayList<>();
         this.COLLECTED_iNGREDIENTS = new HashSet<>();
-        this.ingredient = new ArrayList<>();
         recepies++;
     }
 

@@ -6,27 +6,12 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.Tooltip;
-import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.control.TextField;
 import javafx.geometry.Insets;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
-import javafx.scene.layout.Background;
+import javafx.stage.Stage;
 import ZorkGame.game.ZorkULGame;
 import ZorkGame.commands.Command;
 import ZorkGame.commands.Parser;
@@ -41,57 +26,32 @@ import java.util.Map;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Objects;
 
 public class GUI extends Application {
-    // Style constants
     private static final String DARK_BG = "rgba(20, 20, 20, 0.3)";
     private static final String BORDER_COLOR = "rgba(60, 60, 60, 0.6)";
     private static final String TEXT_COLOR = "#e0e0e0";
+    private static final String TEXT_BUTTON_STYLE = "-fx-background-color: " + DARK_BG + "; -fx-text-fill: " + TEXT_COLOR + "; -fx-border-color: " + BORDER_COLOR + "; -fx-border-width: 1px; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-font-size: 13px; -fx-padding: 8px 15px;";
+    private static final String IMAGE_BUTTON_STYLE = "-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0;";
 
-    private static final String TEXT_BUTTON_STYLE =
-        "-fx-background-color: " + DARK_BG + "; " +
-        "-fx-text-fill: " + TEXT_COLOR + "; " +
-        "-fx-border-color: " + BORDER_COLOR + "; " +
-        "-fx-border-width: 1px; " +
-        "-fx-border-radius: 5px; " +
-        "-fx-background-radius: 5px; " +
-        "-fx-font-size: 13px; " +
-        "-fx-padding: 8px 15px;";
-
-    private static final String IMAGE_BUTTON_STYLE =
-        "-fx-background-color: transparent; " +
-        "-fx-border-color: transparent; " +
-        "-fx-padding: 0;";
-
-    // Game components
     private ZorkULGame game;
     private Parser parser;
     private TextField inputField;
     private TextArea textArea;
     private BorderPane root;
-
-    // Action result panel
     private TextArea actionResultArea;
     private ScrollPane actionResultPane;
     private PrintStream mainOutputStream;
-
-    // Dialogue system
     private NPC currentNPC;
     private boolean inShop;
     private HBox dialogueButtons;
-
-    // Coin display
     private Label coinLabel;
-
-    // HP display
     private Label hpLabel;
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Hecate Game");
-
         root = new BorderPane();
         Scene scene = new Scene(root);
 
@@ -110,22 +70,18 @@ public class GUI extends Application {
         startBackgroundMusic();
     }
 
+    @Override
+    public void stop() {
+        if (game != null) {
+            game.shutdown();
+        }
+    }
+
     private void setupTextArea() {
         textArea = new TextArea();
         textArea.setEditable(false);
         textArea.setWrapText(true);
-        textArea.setStyle(
-            "-fx-control-inner-background: " + DARK_BG + "; " +
-            "-fx-background-color: " + DARK_BG + "; " +
-            "-fx-text-fill: " + TEXT_COLOR + "; " +
-            "-fx-font-size: 14px; " +
-            "-fx-font-family: 'Consolas', 'Courier New', 'Monospaced'; " +
-            "-fx-background: " + DARK_BG + "; " +
-            "-fx-box-border: transparent; " +
-            "-fx-focus-color: transparent; " +
-            "-fx-text-box-border: transparent; " +
-            "-fx-background-insets: 0;"
-        );
+        textArea.setStyle("-fx-control-inner-background: " + DARK_BG + "; -fx-background-color: " + DARK_BG + "; -fx-text-fill: " + TEXT_COLOR + "; -fx-font-size: 14px; -fx-font-family: 'Consolas', 'Courier New', 'Monospaced'; -fx-background: " + DARK_BG + "; -fx-box-border: transparent; -fx-focus-color: transparent; -fx-text-box-border: transparent; -fx-background-insets: 0;");
         textArea.setOpacity(1.0);
     }
 
@@ -133,36 +89,17 @@ public class GUI extends Application {
         actionResultArea = new TextArea();
         actionResultArea.setEditable(false);
         actionResultArea.setWrapText(true);
-        actionResultArea.setStyle(
-            "-fx-control-inner-background: " + DARK_BG + "; " +
-            "-fx-background-color: " + DARK_BG + "; " +
-            "-fx-text-fill: " + TEXT_COLOR + "; " +
-            "-fx-font-size: 14px; " +
-            "-fx-font-family: 'Consolas', 'Courier New', 'Monospaced'; " +
-            "-fx-background: " + DARK_BG + "; " +
-            "-fx-box-border: transparent; " +
-            "-fx-focus-color: transparent; " +
-            "-fx-text-box-border: transparent; " +
-            "-fx-background-insets: 0;"
-        );
+        actionResultArea.setStyle("-fx-control-inner-background: " + DARK_BG + "; -fx-background-color: " + DARK_BG + "; -fx-text-fill: " + TEXT_COLOR + "; -fx-font-size: 14px; -fx-font-family: 'Consolas', 'Courier New', 'Monospaced'; -fx-background: " + DARK_BG + "; -fx-box-border: transparent; -fx-focus-color: transparent; -fx-text-box-border: transparent; -fx-background-insets: 0;");
         actionResultArea.setOpacity(1.0);
 
         actionResultPane = new ScrollPane(actionResultArea);
         actionResultPane.setFitToWidth(true);
         actionResultPane.setFitToHeight(true);
-        actionResultPane.setStyle(
-            "-fx-background: " + DARK_BG + "; " +
-            "-fx-background-color: " + DARK_BG + "; " +
-            "-fx-border-color: " + BORDER_COLOR + "; " +
-            "-fx-border-width: 2px; " +
-            "-fx-border-radius: 5px; " +
-            "-fx-background-radius: 5px;"
-        );
+        actionResultPane.setStyle("-fx-background: " + DARK_BG + "; -fx-background-color: " + DARK_BG + "; -fx-border-color: " + BORDER_COLOR + "; -fx-border-width: 2px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
         actionResultPane.setPadding(new Insets(5));
         actionResultPane.setOpacity(1.0);
         actionResultPane.setVisible(false);
         actionResultPane.setManaged(false);
-
         actionResultPane.viewportBoundsProperty().addListener((obs, oldVal, newVal) -> actionResultArea.setPrefHeight(newVal.getHeight()));
     }
 
@@ -170,17 +107,7 @@ public class GUI extends Application {
         inputField = new TextField();
         inputField.setPromptText("Type your command here...");
         inputField.setPrefHeight(40);
-        inputField.setStyle(
-            "-fx-background-color: " + DARK_BG + "; " +
-            "-fx-text-fill: " + TEXT_COLOR + "; " +
-            "-fx-prompt-text-fill: #808080; " +
-            "-fx-border-color: " + BORDER_COLOR + "; " +
-            "-fx-border-width: 2px; " +
-            "-fx-border-radius: 5px; " +
-            "-fx-background-radius: 5px; " +
-            "-fx-font-size: 14px;"
-        );
-
+        inputField.setStyle("-fx-background-color: " + DARK_BG + "; -fx-text-fill: " + TEXT_COLOR + "; -fx-prompt-text-fill: #808080; -fx-border-color: " + BORDER_COLOR + "; -fx-border-width: 2px; -fx-border-radius: 5px; -fx-background-radius: 5px; -fx-font-size: 14px;");
         inputField.setOnAction(e -> {
             String text = inputField.getText().trim();
             if (!text.isEmpty()) {
@@ -192,45 +119,24 @@ public class GUI extends Application {
     }
 
     private void setupButtons() {
-        // Top buttons
         HBox topButtons = new HBox(10);
         topButtons.setAlignment(Pos.CENTER_LEFT);
         topButtons.setPadding(new Insets(10));
         topButtons.getChildren().addAll(
-            createTextButton(e -> Platform.exit()),
+            createTextButton(e -> {
+                if (game != null) game.shutdown();
+                Platform.exit();
+            }),
             createTextButton("Save", "save"),
             createTextButton("Load", "load")
         );
 
-        // Coin display
         coinLabel = new Label("Coins: 0");
-        coinLabel.setStyle(
-            "-fx-text-fill: gold; " +
-            "-fx-font-size: 18px; " +
-            "-fx-font-weight: bold; " +
-            "-fx-padding: 10px 20px; " +
-            "-fx-background-color: " + DARK_BG + "; " +
-            "-fx-border-color: gold; " +
-            "-fx-border-width: 2px; " +
-            "-fx-border-radius: 5px; " +
-            "-fx-background-radius: 5px;"
-        );
+        coinLabel.setStyle("-fx-text-fill: gold; -fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-color: " + DARK_BG + "; -fx-border-color: gold; -fx-border-width: 2px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
 
-        // HP display
         hpLabel = new Label("HP: 20");
-        hpLabel.setStyle(
-            "-fx-text-fill: #ff6666; " +
-            "-fx-font-size: 18px; " +
-            "-fx-font-weight: bold; " +
-            "-fx-padding: 10px 20px; " +
-            "-fx-background-color: " + DARK_BG + "; " +
-            "-fx-border-color: #ff6666; " +
-            "-fx-border-width: 2px; " +
-            "-fx-border-radius: 5px; " +
-            "-fx-background-radius: 5px;"
-        );
+        hpLabel.setStyle("-fx-text-fill: #ff6666; -fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-background-color: " + DARK_BG + "; -fx-border-color: #ff6666; -fx-border-width: 2px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
 
-        // Container for top bar with buttons on left and coins/HP on right
         HBox topBar = new HBox();
         topBar.setAlignment(Pos.CENTER_LEFT);
         Region spacer = new Region();
@@ -238,10 +144,8 @@ public class GUI extends Application {
         HBox rightStats = new HBox(10);
         rightStats.getChildren().addAll(hpLabel, coinLabel);
         topBar.getChildren().addAll(topButtons, spacer, rightStats);
-
         root.setTop(topBar);
 
-        // Right side buttons
         VBox rightButtons = new VBox(15);
         rightButtons.setAlignment(Pos.CENTER_RIGHT);
         rightButtons.setPadding(new Insets(10));
@@ -272,38 +176,27 @@ public class GUI extends Application {
         ScrollPane scrollPane = new ScrollPane(textArea);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
-        scrollPane.setStyle(
-            "-fx-background: " + DARK_BG + "; " +
-            "-fx-background-color: " + DARK_BG + "; " +
-            "-fx-border-color: " + BORDER_COLOR + "; " +
-            "-fx-border-width: 2px; " +
-            "-fx-border-radius: 5px; " +
-            "-fx-background-radius: 5px;"
-        );
+        scrollPane.setStyle("-fx-background: " + DARK_BG + "; -fx-background-color: " + DARK_BG + "; -fx-border-color: " + BORDER_COLOR + "; -fx-border-width: 2px; -fx-border-radius: 5px; -fx-background-radius: 5px;");
         scrollPane.setPadding(new Insets(5));
         scrollPane.setOpacity(1.0);
         scrollPane.viewportBoundsProperty().addListener((obs, oldVal, newVal) -> textArea.setPrefHeight(newVal.getHeight()));
 
-        // Dialogue buttons
         dialogueButtons = new HBox(10);
         dialogueButtons.setAlignment(Pos.CENTER_LEFT);
         dialogueButtons.setPadding(new Insets(10));
         dialogueButtons.setVisible(false);
 
-        // HBox to hold main text area and action result panel side by side
         HBox textAreasContainer = new HBox(10);
         textAreasContainer.setAlignment(Pos.CENTER_LEFT);
         textAreasContainer.getChildren().addAll(scrollPane, actionResultPane);
         HBox.setHgrow(scrollPane, Priority.ALWAYS);
         HBox.setHgrow(actionResultPane, Priority.ALWAYS);
 
-        // Bottom container
         VBox bottomContainer = new VBox(10);
         bottomContainer.setAlignment(Pos.TOP_LEFT);
         bottomContainer.getChildren().addAll(textAreasContainer, dialogueButtons, inputField);
         VBox.setVgrow(textAreasContainer, Priority.ALWAYS);
 
-        // Center container with spacer
         Region spacer = new Region();
         VBox.setVgrow(spacer, Priority.ALWAYS);
 
@@ -316,7 +209,6 @@ public class GUI extends Application {
 
         root.setCenter(centerContainer);
 
-        // Bind sizes
         scrollPane.prefWidthProperty().bind(scene.widthProperty().multiply(0.4));
         scrollPane.maxWidthProperty().bind(scene.widthProperty().multiply(0.4));
         actionResultPane.prefWidthProperty().bind(scene.widthProperty().multiply(0.4));
@@ -326,19 +218,13 @@ public class GUI extends Application {
         bottomContainer.prefHeightProperty().bind(scene.heightProperty().multiply(0.75));
         spacer.prefHeightProperty().bind(scene.heightProperty().multiply(0.25));
 
-        // Force textarea transparency
         Platform.runLater(() -> {
-            if (textArea.lookup(".content") != null) {
-                textArea.lookup(".content").setStyle("-fx-background-color: " + DARK_BG + ";");
-            }
-            if (actionResultArea.lookup(".content") != null) {
-                actionResultArea.lookup(".content").setStyle("-fx-background-color: " + DARK_BG + ";");
-            }
+            if (textArea.lookup(".content") != null) textArea.lookup(".content").setStyle("-fx-background-color: " + DARK_BG + ";");
+            if (actionResultArea.lookup(".content") != null) actionResultArea.lookup(".content").setStyle("-fx-background-color: " + DARK_BG + ";");
         });
     }
 
     private void setupGameIO() {
-        // Redirect System.out to textarea
         OutputStream out = new OutputStream() {
             private final StringBuilder buffer = new StringBuilder();
 
@@ -346,11 +232,8 @@ public class GUI extends Application {
             public void write(int b) {
                 synchronized (buffer) {
                     char c = (char) b;
-                    if (c == '\n') {
-                        flush();
-                    } else {
-                        buffer.append(c);
-                    }
+                    if (c == '\n') flush();
+                    else buffer.append(c);
                 }
             }
 
@@ -358,9 +241,7 @@ public class GUI extends Application {
             public void write(@NotNull byte[] b, int off, int len) {
                 synchronized (buffer) {
                     buffer.append(new String(b, off, len));
-                    if (buffer.indexOf("\n") >= 0) {
-                        flush();
-                    }
+                    if (buffer.indexOf("\n") >= 0) flush();
                 }
             }
 
@@ -380,7 +261,6 @@ public class GUI extends Application {
         System.setOut(mainOutputStream);
         System.setErr(mainOutputStream);
 
-        // Initialize game
         Character.setGuiMode(true);
         parser = new Parser(true);
         game = new ZorkULGame("Player");
@@ -402,11 +282,9 @@ public class GUI extends Application {
             player.setCycleCount(MediaPlayer.INDEFINITE);
             player.play();
         } catch (Exception e) {
-            System.err.println("Could not load background music");
         }
     }
 
-    // Helper methods for creating buttons
     private Button createTextButton(String text, String command) {
         Button button = new Button(text);
         button.setStyle(TEXT_BUTTON_STYLE);
@@ -435,18 +313,13 @@ public class GUI extends Application {
         button.setGraphic(imageView);
 
         button.setOnAction(e -> {
-            // Track if it's a direction button
-            if (command.startsWith("go ")) {
-                game.getPlayer().trackDirectionButtonUsed();
-            }
+            if (command.startsWith("go ")) game.getPlayer().trackDirectionButtonUsed();
             textArea.appendText("> " + command + "\n");
             processCommand(command);
         });
 
-        // Add tooltip
         if (tooltipText != null && !tooltipText.isEmpty()) {
-            Tooltip tooltip = new Tooltip(tooltipText);
-            button.setTooltip(tooltip);
+            button.setTooltip(new Tooltip(tooltipText));
         }
 
         return button;
@@ -464,10 +337,8 @@ public class GUI extends Application {
 
         button.setOnAction(e -> showActionResult(command));
 
-        // Add tooltip
         if (tooltipText != null && !tooltipText.isEmpty()) {
-            Tooltip tooltip = new Tooltip(tooltipText);
-            button.setTooltip(tooltip);
+            button.setTooltip(new Tooltip(tooltipText));
         }
 
         return button;
@@ -480,9 +351,7 @@ public class GUI extends Application {
         return button;
     }
 
-    // Command processing
     private void processCommand(String input) {
-        // Hide action result panel when any regular command is executed
         hideActionResult();
 
         Command command = parser.parseCommandString(input);
@@ -543,20 +412,12 @@ public class GUI extends Application {
         String imageName = roomName.replace(" ", "").toLowerCase();
         try {
             Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/ZorkGame/images/" + imageName + ".png")));
-            BackgroundImage bgImage = new BackgroundImage(
-                image,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, false, true)
-            );
+            BackgroundImage bgImage = new BackgroundImage(image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, false, true));
             root.setBackground(new Background(bgImage));
         } catch (Exception e) {
-            System.err.println("Background image not found: " + imageName + ".png");
         }
     }
 
-    // Dialogue system
     private void startNPCDialogue(NPC npc) {
         Objects.requireNonNull(npc, "NPC cannot be null");
 
@@ -583,20 +444,14 @@ public class GUI extends Application {
             final int choice = i + 1;
             String text = options.get(i);
 
-            // Remove number prefix if present
             if (text.startsWith(choice + ". ")) {
                 text = text.substring((choice + ". ").length());
             }
 
-            dialogueButtons.getChildren().add(
-                createDialogueButton(text, () -> handleDialogueChoice(choice))
-            );
+            dialogueButtons.getChildren().add(createDialogueButton(text, () -> handleDialogueChoice(choice)));
         }
 
-        dialogueButtons.getChildren().add(
-            createDialogueButton("Exit Conversation", this::endDialogue)
-        );
-
+        dialogueButtons.getChildren().add(createDialogueButton("Exit Conversation", this::endDialogue));
         dialogueButtons.setVisible(true);
     }
 
@@ -632,7 +487,6 @@ public class GUI extends Application {
         return lower.contains("goodbye") || lower.contains("farewell") || lower.contains("walk away");
     }
 
-    // Shop system
     private void enterShop() {
         if (currentNPC == null) {
             endDialogue();
@@ -662,15 +516,10 @@ public class GUI extends Application {
             String buttonText = itemName + " - " + priceText;
 
             textArea.appendText((i + 1) + ". " + buttonText + "\n");
-            dialogueButtons.getChildren().add(
-                createDialogueButton(buttonText, () -> handleShopChoice(itemIndex + 1))
-            );
+            dialogueButtons.getChildren().add(createDialogueButton(buttonText, () -> handleShopChoice(itemIndex + 1)));
         }
 
-        dialogueButtons.getChildren().add(
-            createDialogueButton("Exit Shop", () -> handleShopChoice(items.size() + 1))
-        );
-
+        dialogueButtons.getChildren().add(createDialogueButton("Exit Shop", () -> handleShopChoice(items.size() + 1)));
         dialogueButtons.setVisible(true);
     }
 
@@ -737,12 +586,9 @@ public class GUI extends Application {
         inputField.setDisable(false);
     }
 
-    // Action result panel management
     private void showActionResult(String command) {
-        // Clear previous content
         actionResultArea.clear();
 
-        // Capture output to action panel
         OutputStream actionOut = new OutputStream() {
             private final StringBuilder buffer = new StringBuilder();
 
@@ -750,11 +596,8 @@ public class GUI extends Application {
             public void write(int b) {
                 synchronized (buffer) {
                     char c = (char) b;
-                    if (c == '\n') {
-                        flush();
-                    } else {
-                        buffer.append(c);
-                    }
+                    if (c == '\n') flush();
+                    else buffer.append(c);
                 }
             }
 
@@ -762,9 +605,7 @@ public class GUI extends Application {
             public void write(@NotNull byte[] b, int off, int len) {
                 synchronized (buffer) {
                     buffer.append(new String(b, off, len));
-                    if (buffer.indexOf("\n") >= 0) {
-                        flush();
-                    }
+                    if (buffer.indexOf("\n") >= 0) flush();
                 }
             }
 
@@ -780,21 +621,16 @@ public class GUI extends Application {
             }
         };
 
-        // Temporarily redirect output to action panel
         System.setOut(new PrintStream(actionOut, true));
 
-        // Process command
         Command cmd = parser.parseCommandString(command);
         game.processCommand(cmd);
 
-        // Restore main output
         System.setOut(mainOutputStream);
 
-        // Update coin display
         updateCoinDisplay();
         updateHPDisplay();
 
-        // Show the panel
         actionResultPane.setVisible(true);
         actionResultPane.setManaged(true);
     }

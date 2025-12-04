@@ -1,55 +1,103 @@
-The new and enhanced Java text adventure should be used to illustrate many key Java programming functionalities, including:
+Prerequisites:
 
-Object-oriented concepts: Classes, objects, inheritance, interfaces, polymorphism (e.g., different item types with subclassing).
+Java 17+
+Maven 3.6+
 
-GUI programming: Swing or JavaFX interfaces for richer interaction.
+Verify versions:
 
-File I/O: Loading and saving game state or configurations.
+bashjava -version
+mvn -version
 
-Collections framework: Use of List, Map, Set for storing rooms, items, commands, NPCs.
+Start:
 
-Exception handling: Managing invalid user input or game errors gracefully.
+Compile
+bashmvn clean compile
 
-Input parsing: String manipulation, tokenization, and command pattern interpretation.
+Run Single Player (Console)
+bashmvn exec:java -Dexec.mainClass="ZorkGame.game.Main"
 
-Generics: Containers or utilities using generic classes.
+Run Single Player (GUI)
+bashmvn javafx:run
 
-Enums: Defining command types, directions, or game states.
+Run Multiplayer
 
-Serialization: For saving complex game objects.
+Server:
+bash./run-server.sh
+Client (open in separate terminal for each player):
+bash./run-client.sh
 
-Unit testing: JUnit-based test cases for game mechanics.
+Specify remote server:
+bash./run-client.sh 192.168.1.100 8080
 
-Reflection: Dynamic class loading for mods or plugins.
-
-Annotations: Metadata for commands or game rules.
-
-Advanced:
-   Multithreading: Background tasks like timed events or NPC behaviors.
-   Networking: Multiplayer functionalities or online leaderboards.
+Configure server port and max players:
+bash./run-server.sh 9000 4
 
 
-Here are some possible extensions you might use to implement some of the above:
+Game Commands:
+ Move using:
+          go north | go south | go east | go west
+        pick/take <item>    => pick up something in the room
+        drop <item>         => drop an item from your inventory
+        use <tool> <item>   => use a tool on a raw material
+        squeeze <berry>     => create juice if possible
+        inventory / inv     => show your items
+        recipes             => check potion progress
+        Raw materials must be processed with the right tools.
+          secateurs => fern, grass
+          knife     => lavender
+        Combine processed ingredients to craft potions.
+        talk <name>         => speak with NPCs
+        map                 => show the world map
+        save <filename>     => save the game (default: savegame.sav)
+        load <filename>     => load a saved game
+        NPCs may require specific items before helping you.
 
-Add items and inventory: Allow players to pick up, use, and drop items scattered throughout rooms. Manage player inventory and item interactions.
 
-Introduce puzzles and challenges: Implement simple logic puzzles or locked doors requiring keys or solving riddles to progress.
+Build:
 
-Create NPC characters: Add non-player characters with whom players can interact via dialogue, trading, or quests.
+Create JAR
+bashmvn clean package -Dmaven.test.skip=true
 
-Add scoring or objectives: Introduce goals like collecting certain items or reaching rooms within time or moves to give players purpose.
+Run from JAR
+bashjava -jar target/my-game-1.0-SNAPSHOT.jar
 
-Expand room complexity: Add more rooms with branching paths, hidden passages, or special events triggered by player actions.
+Multiplayer server from JAR:
+bashjava -cp target/my-game-1.0-SNAPSHOT.jar ZorkGame.networking.MultiplayerGameServer
 
-Implement saving and loading: Allow players to save game state and resume later.
+Multiplayer client from JAR:
+bashjava -cp target/my-game-1.0-SNAPSHOT.jar ZorkGame.networking.MultiplayerClient
 
-Improve command parser: Support more nuanced commands, synonyms, or multi-word inputs for richer interaction.
 
-Add sound or basic graphics: Integrate simple audio cues or ASCII art to enhance immersion.
+Project Structure:
 
-Support multiple players or multiplayer: Enable turn-based multiplayer gameplay or allow multiple players in the same world.
+JavaZork/
+├── src/main/java/ZorkGame/
+│   ├── game/          Core game logic
+│   ├── models/        Game entities
+│   ├── commands/      Command parsing
+│   ├── GUI/           JavaFX interface
+│   ├── networking/    Multiplayer systems
+│   ├── threading/     Background tasks
+│   ├── enums/         Game constants
+│   └── utils/         Utilities
+├── src/main/resources/
+│   ├── fxml/          UI layouts
+│   └── backgrounds/   Background images
+├── run-server.sh      Server launcher
+├── run-client.sh      Client launcher
+└── pom.xml            Maven configuration
 
-Add difficulty levels or hints: Provide adjustable challenges or in-game help to guide new players.
 
-These extensions could greatly increase gameplay depth, player engagement, and replayability for this classic text adventure foundation
+Troubleshooting:
 
+IssueSolutionMain class not found Run
+mvn clean compile#
+GUI fails to startVerify JavaFX configuration in pom.xml
+Connection refused => ensure server is running and port 8080 is open
+Build errors run
+mvn clean install -Dmaven.test.skip=true
+
+
+
+mvn test
+mvn clean install

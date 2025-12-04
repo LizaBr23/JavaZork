@@ -2,7 +2,7 @@ package ZorkGame;
 
 import ZorkGame.models.Character;
 import ZorkGame.models.Room;
-import ZorkGame.models.Item;
+import ZorkGame.models.GenericItem;
 import ZorkGame.models.Recipe;
 
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ public class CharacterTest {
 
     @Test
     public void testListInventory_givenOneItem(){
-        Item potion = new Item("potion", "potion", testRoom,1);
+        GenericItem potion = new GenericItem("potion", "potion", testRoom,1);
         testRoom.addItem(potion);
         testCharacter.takeItem("potion");
 
@@ -53,9 +53,9 @@ public class CharacterTest {
 
     @Test
     public void testListInventory_givenMultipleItems(){
-        Item potion = new Item("potion", "potion", testRoom,1);
-        Item potion2 = new Item("potion2", "potion2", testRoom,2);
-        Item potion3 = new Item("potion3", "potion3", testRoom,3);
+        GenericItem potion = new GenericItem("potion", "potion", testRoom,1);
+        GenericItem potion2 = new GenericItem("potion2", "potion2", testRoom,2);
+        GenericItem potion3 = new GenericItem("potion3", "potion3", testRoom,3);
         testRoom.addItem(potion);
         testRoom.addItem(potion2);
         testRoom.addItem(potion3);
@@ -74,9 +74,9 @@ public class CharacterTest {
 
     @Test
     public void testListInventory_givenMultipleSameItems(){
-        Item potion = new Item("potion", "potion", testRoom,1);
-        Item potion2 = new Item("potion", "potion", testRoom,2);
-        Item potion3 = new Item("potion", "potion", testRoom,3);
+        GenericItem potion = new GenericItem("potion", "potion", testRoom,1);
+        GenericItem potion2 = new GenericItem("potion", "potion", testRoom,2);
+        GenericItem potion3 = new GenericItem("potion", "potion", testRoom,3);
         testRoom.addItem(potion);
         testRoom.addItem(potion2);
         testRoom.addItem(potion3);
@@ -94,9 +94,9 @@ public class CharacterTest {
 
     @Test
     public void testListInventory_givenMixedItems(){
-        Item potion = new Item("potion", "potion", testRoom,1);
-        Item potion2 = new Item("potion", "potion", testRoom,2);
-        Item fire = new Item("fire", "fire", testRoom,3);
+        GenericItem potion = new GenericItem("potion", "potion", testRoom,1);
+        GenericItem potion2 = new GenericItem("potion", "potion", testRoom,2);
+        GenericItem fire = new GenericItem("fire", "fire", testRoom,3);
         testRoom.addItem(potion);
         testRoom.addItem(potion2);
         testRoom.addItem(fire);
@@ -114,7 +114,7 @@ public class CharacterTest {
 
     @Test
     public void testListInventory_afterDroppingItem(){
-        Item potion = new Item("potion", "potion", testRoom,1);
+        GenericItem potion = new GenericItem("potion", "potion", testRoom,1);
         testRoom.addItem(potion);
         testCharacter.takeItem("potion");
 
@@ -151,13 +151,13 @@ public class CharacterTest {
         testRoom.addItem(recipe);
         testCharacter.takeItem("healingPotion");
 
-        outContent.reset();
+        outContent.reset(); // Reset AFTER takeItem to avoid capturing its output
         testCharacter.checkRecipes();
 
         String output = outContent.toString();
         assertTrue(output.contains("=== Recipe Progress ==="));
         assertTrue(output.contains("healingPotion: 0/2 ingredients collected"));
-        assertTrue(output.contains("Needs: water sugar"));
+        assertTrue(output.contains("  Needs: water sugar "));
     }
 
     @Test
@@ -179,7 +179,7 @@ public class CharacterTest {
         String output = outContent.toString();
         assertTrue(output.contains("=== Recipe Progress ==="));
         assertTrue(output.contains("healingPotion: 1/3 ingredients collected"));
-        assertTrue(output.contains("Needs: water sugar herbs"));
+        assertTrue(output.contains("  Needs: water sugar herbs "));
     }
 
     @Test
@@ -201,7 +201,7 @@ public class CharacterTest {
         String output = outContent.toString();
         assertTrue(output.contains("=== Recipe Progress ==="));
         assertTrue(output.contains("healingPotion: 2/2 ingredients collected"));
-        assertTrue(output.contains("Needs: water sugar"));
+        assertTrue(output.contains("  Needs: water sugar "));
     }
 
     @Test
@@ -233,8 +233,8 @@ public class CharacterTest {
         assertTrue(output.contains("=== Recipe Progress ==="));
         assertTrue(output.contains("healingPotion: 2/2 ingredients collected"));
         assertTrue(output.contains("firePotion: 0/3 ingredients collected"));
-        assertTrue(output.contains("Needs: water sugar"));
-        assertTrue(output.contains("Needs: fire oil cloth"));
+        assertTrue(output.contains("  Needs: water sugar "));
+        assertTrue(output.contains("  Needs: fire oil cloth "));
     }
 
 

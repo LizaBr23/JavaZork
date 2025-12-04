@@ -28,17 +28,96 @@ import ZorkGame.models.GenericItem;
 import ZorkGame.models.NPC;
 import ZorkGame.models.RawMaterial;
 import ZorkGame.models.Room;
+import ZorkGame.threading.TimedEventManager;
+import ZorkGame.threading.HintEvent;
+import ZorkGame.threading.NPCMovementThread;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
 
 
 public class ZorkULGame {
     private final Parser parser;
     private Character player;
     private final String name;
+    private TimedEventManager eventManager;
+    private List<NPCMovementThread> npcThreads;
 
     public ZorkULGame(String name) {
         this.name = name;
         createRooms();
         parser = new Parser();
+        initializeThreading();
+    }
+
+    private void initializeThreading() {
+        // Initialize event manager for timed events
+        eventManager = new TimedEventManager();
+        npcThreads = new ArrayList<>();
+
+        // Schedule periodic hint event (every 2 minutes)
+        HintEvent hintEvent = new HintEvent(player, 120000); // 120000ms = 2 minutes
+        eventManager.scheduleRepeating(hintEvent);
+
+        // Start NPC movement threads
+        startNPCMovement();
+    }
+
+    private void startNPCMovement() {
+        // Get all rooms for NPC movement
+        List<Room> allRooms = getAllRooms();
+
+        // Find Bob and start his movement thread
+        for (Room room : allRooms) {
+            for (NPC npc : room.getNPCs()) {
+                // Create movement thread for each NPC (moves every 45 seconds)
+                NPCMovementThread movementThread = new NPCMovementThread(npc, allRooms, 45000);
+                movementThread.start();
+                npcThreads.add(movementThread);
+            }
+        }
+    }
+
+    private List<Room> getAllRooms() {
+        List<Room> rooms = new ArrayList<>();
+        Room currentRoom = player.getCurrentRoom();
+
+        // Traverse all connected rooms using BFS
+        Set<Room> visited = new java.util.HashSet<>();
+        java.util.Queue<Room> queue = new java.util.LinkedList<>();
+        queue.add(currentRoom);
+        visited.add(currentRoom);
+
+        while (!queue.isEmpty()) {
+            Room room = queue.poll();
+            rooms.add(room);
+
+            // Check all directions
+            for (Direction direction : Direction.values()) {
+                Room neighbor = room.getExit(direction.getDirectionName());
+                if (neighbor != null && !visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    queue.add(neighbor);
+                }
+            }
+        }
+
+        return rooms;
+    }
+
+    public void shutdown() {
+        // Stop all NPC movement threads
+        if (npcThreads != null) {
+            for (NPCMovementThread thread : npcThreads) {
+                thread.stopMovement();
+            }
+        }
+
+        // Shutdown event manager
+        if (eventManager != null) {
+            eventManager.shutdown();
+        }
     }
 
     private void createRooms() {
@@ -254,6 +333,7 @@ public class ZorkULGame {
                     System.out.println("Quit what?");
                     return false;
                 } else {
+                    shutdown();
                     return true;
                 }
             default:

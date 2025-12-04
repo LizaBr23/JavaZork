@@ -1,12 +1,14 @@
 package ZorkGame.utils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
-import ZorkGame.enums.Direction;
+
 import ZorkGame.models.Room;
 
 public class GameMap implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Map<Room, Position> roomPositions;
@@ -187,14 +189,14 @@ public class GameMap implements Serializable {
     }
 
     private String getRoomName(Room room) {
-        String name = room.getDescription();
+        StringBuilder name = new StringBuilder(room.getDescription());
 
-        if (name.startsWith("in the ")) {
-            name = name.substring(7);
+        if (name.toString().startsWith("in the ")) {
+            name = new StringBuilder(name.substring(7));
         }
 
-        if (name.length() > 0) {
-            name = name.substring(0, 1).toUpperCase() + name.substring(1);
+        if (!name.isEmpty()) {
+            name = new StringBuilder(name.substring(0, 1).toUpperCase() + name.substring(1));
         }
 
         if (name.length() > 15) {
@@ -202,12 +204,13 @@ public class GameMap implements Serializable {
         }
 
         while (name.length() < 15) {
-            name += " ";
+            name.append(" ");
         }
-        return name;
+        return name.toString();
     }
 
     private static class Position implements Serializable {
+        @Serial
         private static final long serialVersionUID = 1L;
         int x, y;
 

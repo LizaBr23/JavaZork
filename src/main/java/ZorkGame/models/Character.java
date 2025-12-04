@@ -100,14 +100,6 @@ public class Character implements GameEntity, Locatable, Serializable {
             return hp;
     }
 
-    private void looseHp(int hp){
-        this.hp -= hp;
-    }
-
-    private void GainHp(int hp){
-        this.hp += hp;
-    }
-
     private void spendCoins(int amount) {
         this.coins -= amount;
     }
@@ -175,10 +167,8 @@ public class Character implements GameEntity, Locatable, Serializable {
                 inDialogue = false;
             } else {
                 try {
-                    // Try to parse the input as a number
                     int choice = Integer.parseInt(input);
 
-                    // Validate the choice is within valid range
                     if (choice < 1 || choice > options.size()) {
                         throw new InvalidDialogueInputException(
                             "Choice " + choice + " is out of range. Please choose between 1 and " + options.size() + ".");
@@ -281,7 +271,6 @@ public class Character implements GameEntity, Locatable, Serializable {
 
 
     public void buyToolFromNPC(NPC npc, String toolName) {
-        // Get the price of the item
         int price = npc.getItemPrice(toolName);
 
         if (price == -1) {
@@ -289,13 +278,11 @@ public class Character implements GameEntity, Locatable, Serializable {
             return;
         }
 
-        // Check if player has enough coins
         if (coins < price) {
             System.out.println("You don't have enough coins! You need " + price + " coins but only have " + coins + ".\n");
             return;
         }
 
-        //try to create a tool first
         Tool tool = createToolByName(toolName);
         if (tool != null) {
             INVENTORY.add(tool);
@@ -305,7 +292,6 @@ public class Character implements GameEntity, Locatable, Serializable {
             System.out.println("You obtained: " + toolName + " from " + npc.getName() + " for " + price + " coins.\n");
             System.out.println("Coins remaining: " + coins + "\n");
         } else {
-            //if not a tool, try to create an item
             Item item = createRecipeByName(toolName);
             if (item != null) {
                 INVENTORY.add(item);
@@ -337,7 +323,6 @@ public class Character implements GameEntity, Locatable, Serializable {
         return null;
     }
 
-    //check for a specific item
     public boolean hasItem(String itemName) {
         for (Item item : INVENTORY.getAll()) {
             if (item.getName().equalsIgnoreCase(itemName)) {
@@ -500,7 +485,6 @@ public class Character implements GameEntity, Locatable, Serializable {
 
                 checkAlchemistAchievement();
             } else {
-                // Regular item
                 System.out.println("\nYou picked up " + foundItem.getName() + ".\n");
             }
 
@@ -576,10 +560,6 @@ public class Character implements GameEntity, Locatable, Serializable {
             System.out.println("You don't have any recipes yet.");
         }
         System.out.println();
-    }
-
-    public void checkRecipesParallel() {
-        checkRecipes();
     }
 
     public void unlockAchievement(AchievementType achievement) {

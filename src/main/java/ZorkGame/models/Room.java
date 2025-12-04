@@ -33,6 +33,10 @@ public class Room implements Describable, Serializable {
         NPCS.add(npc);
     }
 
+    public void removeNPC(NPC npc){
+        NPCS.remove(npc);
+    }
+
     public List<Item> getItems() {
         return ITEMS.getAll();
     }
